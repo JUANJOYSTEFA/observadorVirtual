@@ -30,6 +30,7 @@ class Administrativos(models.Model):
     nombre = models.CharField(max_length=100)
     apellido = models.CharField(max_length=100)
     cargo = models.CharField(max_length=100)
+    ciclo = models.CharField(max_length=12)
     correo = models.EmailField(max_length=100)
     contrasena = models.CharField(max_length=100)
 
