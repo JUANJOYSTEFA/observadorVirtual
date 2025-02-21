@@ -16,6 +16,7 @@ from pathlib import Path
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 
+
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
 
@@ -37,7 +38,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'modulos.Observador'
+    'modulos.Observador',
 ]
 
 MIDDLEWARE = [
@@ -77,9 +78,10 @@ WSGI_APPLICATION = 'observadorVirtual.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME':'observador.sqlite3',
+        'NAME': BASE_DIR / 'observador.sqlite3',  # Asegúrate de que la ruta sea correcta
     }
 }
+
 
 
 # Password validation
