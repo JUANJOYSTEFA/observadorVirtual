@@ -8,8 +8,6 @@ class Grado(models.Model):
     def __str__(self):
         return f"Ciclo: {self.ciclo}, Grado: {self.grado}"
 
-from django.db import models
-
 class Estudiante(models.Model):
     idEstudiante = models.AutoField(primary_key=True)
     tiposDocumentos = [
