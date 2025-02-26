@@ -24,10 +24,6 @@ class Grado(models.Model):
     def __str__(self):
         return f"Ciclo: {self.ciclo}, Grado: {self.grado}"
 
-    class Meta:
-        verbose_name = 'Grado'
-
-from django.db import models
 
 class Estudiante(models.Model):
     idEstudiante = models.AutoField(primary_key=True)
