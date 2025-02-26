@@ -1,12 +1,31 @@
 from django.db import models
 
+class Colegio(models.Model):
+    idColegio = models.AutoField(primary_key=True)
+    nombre = models.CharField(max_length=50)
+    direccion = models.CharField(max_length=100)
+    telefono = models.CharField(max_length=13)
+    email = models.EmailField(max_length=100)
+
+    def __str__(self):
+        return f"idColegio: {self.idColegio}, Nombre: {self.nombre}"
+
+    class Meta:
+        verbose_name = 'Colegio'
+    
+
+
 class Grado(models.Model):
     idGrado = models.AutoField(primary_key=True)
-    grado = models.CharField(max_length=10, null=True, blank=True)
+    grado = models.CharField(max_length=16, null=True, blank=True)
     ciclo = models.CharField(max_length=7)
+    idColegio = models.ForeignKey(Colegio, on_delete=models.CASCADE, related_name="grado", default= 1)
 
     def __str__(self):
         return f"Ciclo: {self.ciclo}, Grado: {self.grado}"
+
+    class Meta:
+        verbose_name = 'Grado'
 
 from django.db import models
 
@@ -26,12 +45,14 @@ class Estudiante(models.Model):
     faltasTipo1 = models.IntegerField(default=0)
     faltasTipo2 = models.IntegerField(default=0)
     faltasTipo3 = models.IntegerField(default=0)
+    idColegio = models.ForeignKey(Colegio, on_delete=models.CASCADE, related_name="estudiantes", default= 1)
     idGrado = models.ForeignKey(Grado, on_delete=models.CASCADE, null=True, blank=True)
 
     def __str__(self):
         return f"{self.idEstudiante}, {self.apellido} {self.nombre}, Identificación: {self.tipoDocumento} {self.documento}"
 
-
+    class Meta:
+        verbose_name = 'Estudiante'
 
 
 class Acudiente(models.Model):
@@ -45,13 +66,16 @@ class Acudiente(models.Model):
     documento = models.CharField(max_length=10, default=0)
     nombre = models.CharField(max_length=100)
     apellido = models.CharField(max_length=100)
-    telefono = models.CharField(max_length=10)  # Mejor CharField para conservar ceros iniciales
+    telefono = models.CharField(max_length=13)  # Mejor CharField para conservar ceros iniciales
     correo = models.EmailField(max_length=100)  # EmailField valida automáticamente correos
     contrasena = models.CharField(max_length=100)
     idEstudiante = models.ForeignKey(Estudiante, on_delete=models.CASCADE, related_name="acudientes")
 
     def __str__(self):
         return f"Estudiante: {self.idEstudiante}, Apellido: {self.apellido}, Nombre: {self.nombre}"
+
+    class Meta:
+        verbose_name = 'Acudiente'
 
 class Administrativos(models.Model):
     idAdministrativo = models.AutoField(primary_key=True)
@@ -62,10 +86,17 @@ class Administrativos(models.Model):
     correo = models.EmailField(max_length=100)
     contrasena = models.CharField(max_length=100)
 
+    class Meta:
+        verbose_name = 'Administrativos'
+
 class Faltas(models.Model):
     idFalta = models.AutoField(primary_key=True)
     tipoFalta = models.IntegerField()
     descripcion = models.TextField(max_length=1000)
+    idColegio = models.ForeignKey(Colegio, on_delete=models.CASCADE, related_name="faltas", default= 1)
+
+    class Meta:
+        verbose_name = 'Faltas'
 
 class Observacion(models.Model):
     idObservacion = models.AutoField(primary_key=True)
@@ -77,9 +108,15 @@ class Observacion(models.Model):
     hora = models.TimeField()
     comentario = models.TextField(max_length=1000)
 
+    class Meta:
+        verbose_name = 'Observacion'
+
 class Citaciones(models.Model):
     idCitacion = models.AutoField(primary_key=True)
     fecha = models.DateField()
     hora = models.TimeField()
     idAcudiente = models.ForeignKey(Acudiente, on_delete=models.CASCADE, related_name="citaciones")
     idEstudiante = models.ForeignKey(Estudiante, on_delete=models.CASCADE, related_name="citaciones")
+
+    class Meta:
+        verbose_name = 'Citaciones'
