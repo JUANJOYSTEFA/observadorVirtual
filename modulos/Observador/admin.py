@@ -1,6 +1,7 @@
 from django.contrib import admin
 from modulos.Observador.models import *
 
+admin.site.register(Colegio)
 admin.site.register(Grado)
 admin.site.register(Estudiante)
 admin.site.register(Acudiente)
