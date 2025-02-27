@@ -68,7 +68,7 @@ class Acudiente(models.Model):
     idEstudiante = models.ForeignKey(Estudiante, on_delete=models.CASCADE, related_name="acudientes")
 
     def __str__(self):
-        return f"Estudiante: {self.idEstudiante}, Apellido: {self.apellido}, Nombre: {self.nombre}"
+        return f"Estudiante: {self.idEstudiante}, Nombre: {self.apellido} {self.nombre}"
 
     class Meta:
         verbose_name = 'Acudiente'
@@ -77,19 +77,40 @@ class Administrativos(models.Model):
     idAdministrativo = models.AutoField(primary_key=True)
     nombre = models.CharField(max_length=100)
     apellido = models.CharField(max_length=100)
-    cargo = models.CharField(max_length=100)
-    ciclo = models.CharField(max_length=12)
+
+    cargos = [  # Lista de tuplas para choices
+        ('profesor', 'Profesor'),
+        ('directivo', 'Directivo'),
+    ]
+    
+    cargo = models.CharField(max_length=9, choices=cargos, default='profesor')
+    ciclo = models.CharField(max_length=12, null=True, blank=True)
     correo = models.EmailField(max_length=100)
     contrasena = models.CharField(max_length=100)
+
+    def __str__(self):
+        if self.cargo == 'profesor' and self.ciclo:
+            return f"idAdministrativo: {self.idAdministrativo}, Nombre: {self.nombre} {self.apellido}, Cargo: {self.cargo}, Ciclo: {self.ciclo}"
+        return f"idAdministrativo: {self.idAdministrativo}, Nombre: {self.nombre} {self.apellido}, Cargo: {self.cargo}"
+
 
     class Meta:
         verbose_name = 'Administrativos'
 
 class Faltas(models.Model):
     idFalta = models.AutoField(primary_key=True)
-    tipoFalta = models.IntegerField()
+    tiposFaltas = [
+        (1, "Tipo 1"),
+        (2, "Tipo 2"),
+        (3, "Tipo 3")
+    ]
+    tipoFalta = models.IntegerField(choices=tiposFaltas, default= 1)
+    falta = models.CharField(max_length=10, null=True, blank=True)
     descripcion = models.TextField(max_length=1000)
     idColegio = models.ForeignKey(Colegio, on_delete=models.CASCADE, related_name="faltas", default= 1)
+
+    def __str__(self):
+        return f"Falta: {self.falta}: {self.descripcion}, Falta de tipo: {self.tipoFalta}"
 
     class Meta:
         verbose_name = 'Faltas'
@@ -104,6 +125,9 @@ class Observacion(models.Model):
     hora = models.TimeField()
     comentario = models.TextField(max_length=1000)
 
+    def __str__(self):
+        return f"Estudiante: {self.idEstudiante}, Falta: {self.idFalta}, Fecha: {self.fecha}, Administrativo: {self.idAdministrativo}"
+    
     class Meta:
         verbose_name = 'Observacion'
 
@@ -113,6 +137,9 @@ class Citaciones(models.Model):
     hora = models.TimeField()
     idAcudiente = models.ForeignKey(Acudiente, on_delete=models.CASCADE, related_name="citaciones")
     idEstudiante = models.ForeignKey(Estudiante, on_delete=models.CASCADE, related_name="citaciones")
+
+    def __str__(self):
+        return f"Fecha: {self.fecha} {self.hora}, Estudiante: {self.idEstudiante}, Acudiente: {self.idAcudiente}"
 
     class Meta:
         verbose_name = 'Citaciones'
