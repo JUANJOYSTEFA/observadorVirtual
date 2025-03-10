@@ -68,7 +68,7 @@ class Acudiente(models.Model):
     idEstudiante = models.ForeignKey(Estudiante, on_delete=models.CASCADE, related_name="acudientes")
 
     def __str__(self):
-        return f"Estudiante: {self.idEstudiante}, Nombre: {self.apellido} {self.nombre}"
+        return f"Estudiante: {self.idEstudiante}, Nombre Acudiente: {self.apellido} {self.nombre}"
 
     class Meta:
         verbose_name = 'Acudiente'
@@ -139,7 +139,7 @@ class Citaciones(models.Model):
     idEstudiante = models.ForeignKey(Estudiante, on_delete=models.CASCADE, related_name="citaciones")
 
     def __str__(self):
-        return f"Fecha: {self.fecha} {self.hora}, Estudiante: {self.idEstudiante}, Acudiente: {self.idAcudiente}"
+        return f"Fecha: {self.fecha} {self.hora}, {self.idAcudiente}"
 
     class Meta:
         verbose_name = 'Citaciones'
