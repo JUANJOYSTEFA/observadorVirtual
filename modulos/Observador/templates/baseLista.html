@@ -1,0 +1,64 @@
+{% extends "index.html" %}
+{% load mathfilters %}
+{% block js %}
+<script>
+  function eliminarRegistro(url){
+    Swal.fire({
+      title: "¿Estás seguro?",
+      text: "Esta acción no se puede deshacer",
+      icon: "warning",
+      showCancelButton: true,
+      cancelButtonText: "Cancelar",
+      confirmButtonText: "Eliminar",
+      confirmButtonColor: "#dc3545"
+    }).then((result) => {
+      if (result.isConfirmed) {
+        window.location.href = url;
+      }
+    });
+  }
+</script>
+{% endblock %}
+
+{% block contenido %}
+<div class="container py-4">
+  <h2>Listado de {{ titulo }}</h2>
+
+  <nav class="navbar navbar-light bg-light">
+    <form class="d-flex" method="GET">
+      <div class="input-group">
+        <input type="text" class="form-control me-2" placeholder="Buscar" name="q" value="{{ query }}">
+        <button class="btn btn-outline-success" type="submit">Buscar</button>
+      </div>
+    </form>
+  </nav>
+
+  <div class="table-responsive mt-3">
+    <table class="table table-striped">
+      <thead>
+        <tr>
+          {% for encabezado in encabezados %}
+            <th>{{ encabezado }}</th>
+          {% endfor %}
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for item in objetos %}
+        <tr>
+          {% for campo in campos %}
+            <td>{{ item|attr:campo }}</td>
+          {% endfor %}
+          <td>
+            <a href="{% url editar_url item.pk %}" class="btn btn-info btn-sm">Modificar</a>
+            <a href="#" onclick="eliminarRegistro('{% url eliminar_url item.pk %}')" class="btn btn-danger btn-sm">Eliminar</a>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  <a href="{% url crear_url %}" class="btn btn-primary">Agregar {{ titulo }}</a>
+</div>
+{% endblock %}
