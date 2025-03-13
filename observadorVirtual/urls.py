@@ -16,9 +16,16 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
-from Modulos.Observador.views import listaColegios
+from django.contrib.auth.views import LogoutView
+from Modulos.Observador.views import redirigirHome, listaColegios, agregarColegio, modificarColegio, eliminarColegio, LoginFormView
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('', redirigirHome, name='home'),
+    path('login/', LoginFormView.as_view(), name='login'),
+    path('logout/', LogoutView.as_view(next_page='login'), name='logout'),
     path('listaColegios/', listaColegios, name='listaColegios'),
+    path('agregarColegio/', agregarColegio, name="agregarColegio"),
+    path('modificarColegio/<idColegio>/', modificarColegio, name="modificarColegio"),
+    path('eliminarColegio/<idColegio>/', eliminarColegio, name="eliminarColegio"),
 ]

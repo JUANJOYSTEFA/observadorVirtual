@@ -1,0 +1,4 @@
+django-bootstrap-v5
+django-admin-interface
+django-crispy-forms
+xhtml2pdf
