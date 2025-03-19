@@ -61,3 +61,6 @@ def eliminarColegio(request, idColegio):
 	carrera.delete()
 	messages.success(request, "Eliminado Correctamente")
 	return redirect(to="listaColegios")
+
+def index(request):
+    return render(request, 'index.html')

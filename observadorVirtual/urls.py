@@ -17,7 +17,7 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 from django.contrib.auth.views import LogoutView
-from Modulos.Observador.views import redirigirHome, listaColegios, agregarColegio, modificarColegio, eliminarColegio, LoginFormView
+from Modulos.Observador.views import redirigirHome, listaColegios, agregarColegio, modificarColegio, eliminarColegio, LoginFormView, index
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -28,4 +28,5 @@ urlpatterns = [
     path('agregarColegio/', agregarColegio, name="agregarColegio"),
     path('modificarColegio/<idColegio>/', modificarColegio, name="modificarColegio"),
     path('eliminarColegio/<idColegio>/', eliminarColegio, name="eliminarColegio"),
+    path('index/', index, name='index'),
 ]
