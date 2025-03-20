@@ -26,6 +26,8 @@ urlpatterns = [
     path('logout/', LogoutView.as_view(next_page='login'), name='logout'),
     path('listaColegio/', listaColegio, name='listaColegio'),
     path('agregarColegio/', agregarColegio, name="agregarColegio"),
-    path('modificarColegio/<idColegio>/', modificarColegio, name="modificarColegio"),
-    path('eliminarColegio/<idColegio>/', eliminarColegio, name="eliminarColegio"),
+    path('modificarColegio/<idColegio>/',
+         modificarColegio, name="modificarColegio"),
+    path('eliminarColegio/<idColegio>/',
+         eliminarColegio, name="eliminarColegio"),
 ]
