@@ -17,15 +17,19 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 from django.contrib.auth.views import LogoutView
-from Modulos.Observador.views import redirigirHome, listaColegios, agregarColegio, modificarColegio, eliminarColegio, LoginFormView
+from Modulos.Observador.views import *
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', redirigirHome, name='home'),
     path('login/', LoginFormView.as_view(), name='login'),
     path('logout/', LogoutView.as_view(next_page='login'), name='logout'),
-    path('listaColegios/', listaColegios, name='listaColegios'),
+    path('listaColegio/', listaColegio, name='listaColegio'),
     path('agregarColegio/', agregarColegio, name="agregarColegio"),
     path('modificarColegio/<idColegio>/', modificarColegio, name="modificarColegio"),
     path('eliminarColegio/<idColegio>/', eliminarColegio, name="eliminarColegio"),
+    path('listaGrado/', listaGrado, name='listaGrado'),
+    path('agregarGrado/', agregarGrado, name="agregarGrado"),
+    path('modificarGrado/<idGrado>/', modificarGrado, name="modificarGrado"),
+    path('eliminarGrado/<idGrado>/', eliminarGrado, name="eliminarGrado"),
 ]

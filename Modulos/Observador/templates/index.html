@@ -6,6 +6,13 @@
 <html lang="en">
 
 	<head>
+		<style>
+			.profile img {
+				border: none !important;
+				box-shadow: none !important;
+				outline: none !important;
+			}
+		</style>
 		<meta charset="utf-8">
 		<meta content="width=device-width, initial-scale=1.0" name="viewport">
 
@@ -14,12 +21,12 @@
 		<meta http-equiv="Cache-Control" content="no-cache, mustrevalidate">
 		<meta http-equiv="Pragma" content="no-cache">
 
-		<title>COSFA</title>
+		<title>VirTob</title>
 		<meta content="" name="description">
 		<meta content="" name="keywords">
 
 		<!-- Favicons -->
-		<link href="{% static 'img/favicon.png'%}" rel="icon">
+		<link href="{% static 'img/favicon.ico'%}" rel="icon">
 		<link href="{% static 'img/apple-touch-icon.png'%}" rel="apple-touch-icon">
 
 		<!-- Vendor CSS Files -->
@@ -45,17 +52,18 @@
 				</button>
 
 				<div class="profile">
-					<img src="{% static 'img/COSFA2.png'%}" alt="" class="img-fluid rounded-circle">
+					<img src="{% static 'img/logoProyecto.png'%}" alt="" class="img-fluid img-sm">
 					<h1 class="text-light" style="font-size: 35px;"><a href="/">VirTob</a></h1>
 				</div>
 				<nav class="nav-menu">
 					<ul>
 						<li>
-							<a href="{% url 'listaColegios' %}" class="btn btn-outline-primary">Listado
+							<a href="{% url 'listaColegio' %}" class="btn btn-outline-primary">Listado
 								Colegios</a>
 						</li>
 						<li>
-
+							<a href="{% url 'listaGrado' %}" class="btn btn-outline-primary">Listado
+								Grados</a>
 						</li>
 					</ul>
 				</nav><!-- .nav-menu -->
