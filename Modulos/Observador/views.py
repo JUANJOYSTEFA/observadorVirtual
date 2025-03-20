@@ -179,3 +179,6 @@ def eliminarGrado(request, idGrado):
 	grado.delete()
 	messages.success(request, "Eliminado Correctamente")
 	return redirect(to="listaGrado")
+
+def index(request):
+    return render(request, 'index.html')
