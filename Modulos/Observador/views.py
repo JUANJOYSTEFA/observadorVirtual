@@ -156,29 +156,29 @@ def agregarEstudiante(request):
 
 def modificarAcudiente(request, idEstudiante):
     # Busca un elemento por su ID
-    acudiente = get_object_or_404(Estudiante, idGrado=idAcudiente)
+    estudiante = get_object_or_404(Estudiante, idGrado=idEstudiante)
 
     data = {
-        'form': AcudienteForm(instance=acudiente)
+        'form': EstudianteForm(instance=estudiante)
     }
 
     if request.method == 'POST':
         formulario = AcudienteForm(
-            data=request.POST, instance=acudiente, files=request.FILES)
+            data=request.POST, instance=estudiante, files=request.FILES)
         if formulario.is_valid():
             formulario.save()
             messages.success(request, "Modificado Correctamente")
-            return redirect('listaGrado')
+            return redirect('listaEstudiante')
 
         data["form"] = formulario
     return render(request, 'modificar.html', data)
 
 
-def eliminarAcudiente(request, idAcudiente):
-	acudiente = get_object_or_404(Acudiente, idGrado=idAcudiente)
-	acudiente.delete()
+def eliminarEstudiante(request, idEstudiante):
+	estudiante = get_object_or_404(Estudiante, idGrado=idEstudiante)
+	estudiante.delete()
 	messages.success(request, "Eliminado Correctamente")
-	return redirect(to="listaAcudiente")
+	return redirect(to="listaEstudiante")
 
 def index(request):
     return render(request, 'index.html')
