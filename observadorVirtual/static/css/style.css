@@ -1150,3 +1150,8 @@ section {
     padding-right: 20px 15px;
   }
 }
+
+th, td {
+  text-align: center;
+  vertical-align: middle;
+}

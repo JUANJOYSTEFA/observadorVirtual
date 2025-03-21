@@ -38,7 +38,7 @@ def listaColegio(request):
 
     # Muestra el QuerySet filtrado
     logger.info(f"📄 Registros encontrados: {colegios}")
-    return render(request, 'listaColegios.html', {'colegios': colegios, 'query': query})
+    return render(request, 'listaColegios.html', {'colegio': colegios, 'query': query})
 
 
 def agregarColegio(request):
@@ -131,6 +131,59 @@ def eliminarGrado(request, idGrado):
 	return redirect(to="listaGrado")
 
 
+def listaEstudiante(request):
+    estudiante = Estudiante.objects.all()  # Obtiene todos los registros
+    return render(request, 'listaEstudiante.html', {'estudiante': estudiante})
+
+
+def agregarEstudiante(request):
+	data = {
+		'form': EstudianteForm()
+	}
+
+	if request.method == 'POST':
+		formulario = EstudianteForm(data=request.POST, files=request.FILES)
+		if formulario.is_valid():
+			formulario.save()
+			messages.success(request, "Guardado Correctamente")
+			return redirect('listaEstudiante')
+		else:
+			data["form"] = formulario
+			messages.warning(request, "El archivo ya existe")
+			# data["mensaje"]="el archivo ya existe"
+	return render(request, 'agregarEstudiante.html', data)
+
+
+def modificarAcudiente(request, idEstudiante):
+    # Busca un elemento por su ID
+    acudiente = get_object_or_404(Estudiante, idGrado=idAcudiente)
+
+    data = {
+        'form': AcudienteForm(instance=acudiente)
+    }
+
+    if request.method == 'POST':
+        formulario = AcudienteForm(
+            data=request.POST, instance=acudiente, files=request.FILES)
+        if formulario.is_valid():
+            formulario.save()
+            messages.success(request, "Modificado Correctamente")
+            return redirect('listaGrado')
+
+        data["form"] = formulario
+    return render(request, 'modificar.html', data)
+
+
+def eliminarAcudiente(request, idAcudiente):
+	acudiente = get_object_or_404(Acudiente, idGrado=idAcudiente)
+	acudiente.delete()
+	messages.success(request, "Eliminado Correctamente")
+	return redirect(to="listaAcudiente")
+
+def index(request):
+    return render(request, 'index.html')
+
+
 def listaAcudiente(request):
     acudiente = Acudiente.objects.all()  # Obtiene todos los registros
     return render(request, 'listaAcudiente.html', {'acudiente': acudiente})
@@ -174,11 +227,11 @@ def modificarAcudiente(request, idAcudiente):
     return render(request, 'modificar.html', data)
 
 
-def eliminarGrado(request, idGrado):
-	grado = get_object_or_404(Grado, idGrado=idGrado)
-	grado.delete()
+def eliminarAcudiente(request, idAcudiente):
+	acudiente = get_object_or_404(Acudiente, idGrado=idAcudiente)
+	acudiente.delete()
 	messages.success(request, "Eliminado Correctamente")
-	return redirect(to="listaGrado")
+	return redirect(to="listaAcudiente")
 
 def index(request):
     return render(request, 'index.html')

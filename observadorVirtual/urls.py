@@ -28,4 +28,8 @@ urlpatterns = [
     path('agregarColegio/', agregarColegio, name="agregarColegio"),
     path('modificarColegio/<idColegio>/', modificarColegio, name="modificarColegio"),
     path('eliminarColegio/<idColegio>/', eliminarColegio, name="eliminarColegio"),
+    path('listaGrado/', listaGrado, name='listaGrado'),
+    path('agregarGrado/', agregarGrado, name="agregarGrado"),
+    path('modificarGrado/<idGrado>/', modificarGrado, name="modificarGrado"),
+    path('eliminarGrado/<idGrado>/', eliminarGrado, name="eliminarGrado"),
 ]

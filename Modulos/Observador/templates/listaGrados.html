@@ -58,6 +58,7 @@
                         <table class="table table-striped">
                             <thead>
                                 <tr>
+                                    <th>#</th>
                                     <th>ID</th>
                                     <th>GRADO</th>
                                     <th>CICLO</th>
@@ -69,6 +70,7 @@
                                 {% if grado %}
                                 {% for grado in grado %}
                                 <tr>
+                                    <td class="">{{ forloop.counter }}</td>
                                     <td class="">{{ grado.idGrado }}</td>
                                     <td class="">{{ grado.grado }}</td>
                                     <td class="">{{ grado.ciclo }}</td>
