@@ -22,7 +22,7 @@ class Grado(models.Model):
     idColegio = models.ForeignKey(Colegio, on_delete=models.CASCADE, related_name="grado", default= 1)
 
     def __str__(self):
-        return f"Ciclo: {self.ciclo}, Grado: {self.grado}"
+        return f"Grado: {self.grado}, Ciclo: {self.ciclo}"
 
 
 class Estudiante(models.Model):
@@ -79,8 +79,8 @@ class Administrativos(models.Model):
     apellido = models.CharField(max_length=100)
 
     cargos = [  # Lista de tuplas para choices
-        ('profesor', 'Profesor'),
-        ('directivo', 'Directivo'),
+        ('Profesor', 'Profesor'),
+        ('Directivo', 'Directivo'),
     ]
     
     cargo = models.CharField(max_length=9, choices=cargos, default='profesor')

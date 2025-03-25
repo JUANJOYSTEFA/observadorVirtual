@@ -133,7 +133,7 @@ def eliminarGrado(request, idGrado):
 
 def listaEstudiante(request):
     estudiante = Estudiante.objects.all()  # Obtiene todos los registros
-    return render(request, 'listaEstudiante.html', {'estudiante': estudiante})
+    return render(request, 'listaEstudiantes.html', {'estudiante': estudiante})
 
 
 def agregarEstudiante(request):
@@ -154,16 +154,16 @@ def agregarEstudiante(request):
 	return render(request, 'agregarEstudiante.html', data)
 
 
-def modificarAcudiente(request, idEstudiante):
+def modificarEstudiante(request, idEstudiante):
     # Busca un elemento por su ID
-    estudiante = get_object_or_404(Estudiante, idGrado=idEstudiante)
+    estudiante = get_object_or_404(Estudiante, idEstudiante=idEstudiante)
 
     data = {
         'form': EstudianteForm(instance=estudiante)
     }
 
     if request.method == 'POST':
-        formulario = AcudienteForm(
+        formulario = EstudianteForm(
             data=request.POST, instance=estudiante, files=request.FILES)
         if formulario.is_valid():
             formulario.save()
@@ -175,18 +175,15 @@ def modificarAcudiente(request, idEstudiante):
 
 
 def eliminarEstudiante(request, idEstudiante):
-	estudiante = get_object_or_404(Estudiante, idGrado=idEstudiante)
+	estudiante = get_object_or_404(Estudiante, idEstudiante=idEstudiante)
 	estudiante.delete()
 	messages.success(request, "Eliminado Correctamente")
 	return redirect(to="listaEstudiante")
 
-def index(request):
-    return render(request, 'index.html')
-
 
 def listaAcudiente(request):
     acudiente = Acudiente.objects.all()  # Obtiene todos los registros
-    return render(request, 'listaAcudiente.html', {'acudiente': acudiente})
+    return render(request, 'listaAcudientes.html', {'acudiente': acudiente})
 
 
 def agregarAcudiente(request):
@@ -209,7 +206,7 @@ def agregarAcudiente(request):
 
 def modificarAcudiente(request, idAcudiente):
     # Busca un elemento por su ID
-    acudiente = get_object_or_404(Acudiente, idGrado=idAcudiente)
+    acudiente = get_object_or_404(Acudiente, idAcudiente=idAcudiente)
 
     data = {
         'form': AcudienteForm(instance=acudiente)
@@ -221,7 +218,7 @@ def modificarAcudiente(request, idAcudiente):
         if formulario.is_valid():
             formulario.save()
             messages.success(request, "Modificado Correctamente")
-            return redirect('listaGrado')
+            return redirect('listaAcudiente')
 
         data["form"] = formulario
     return render(request, 'modificar.html', data)
@@ -233,5 +230,53 @@ def eliminarAcudiente(request, idAcudiente):
 	messages.success(request, "Eliminado Correctamente")
 	return redirect(to="listaAcudiente")
 
-def index(request):
-    return render(request, 'index.html')
+
+def listaAdministrativo(request):
+    administrativos = Administrativos.objects.all()  # Obtiene todos los registros
+    return render(request, 'listaAdministrativos.html', {'administrativo': administrativos})
+
+
+def agregarAdministrativo(request):
+	data = {
+		'form': AdministrativosForm()
+	}
+
+	if request.method == 'POST':
+		formulario = AdministrativosForm(data=request.POST, files=request.FILES)
+		if formulario.is_valid():
+			formulario.save()
+			messages.success(request, "Guardado Correctamente")
+			return redirect('listaAdministrativo')
+		else:
+			data["form"] = formulario
+			messages.warning(request, "El archivo ya existe")
+			# data["mensaje"]="el archivo ya existe"
+	return render(request, 'agregarAdministrativos.html', data)
+
+
+def modificarAdministrativo(request, idAdministrativo):
+    # Busca un elemento por su ID
+    administrativos = get_object_or_404(
+        Administrativos, idAdministrativo=idAdministrativo)
+
+    data = {
+        'form': AdministrativosForm(instance=administrativos)
+    }
+
+    if request.method == 'POST':
+        formulario = AdministrativosForm(
+            data=request.POST, instance=administrativos, files=request.FILES)
+        if formulario.is_valid():
+            formulario.save()
+            messages.success(request, "Modificado Correctamente")
+            return redirect('listaAdministrativo')
+
+        data["form"] = formulario
+    return render(request, 'modificar.html', data)
+
+
+def eliminarAdministrativo(request, idAdministrativo):
+	administrativos = get_object_or_404(Administrativos, idAdministrativo=idAdministrativo)
+	administrativos.delete()
+	messages.success(request, "Eliminado Correctamente")
+	return redirect(to="listaAdministrativo")
