@@ -1,8 +1,8 @@
-{% extends "index.html" %}
+{% extends "../index.html" %}
 {% load static %}
 {% block js %}
 <script>
-    function eliminarEstudiante(idEstudiante) {
+    function eliminarColegio(idColegio) {
         Swal.fire({
             title: "¿Estas seguro?",
             text: "Esta acción no se puede deshacer",
@@ -14,7 +14,7 @@
             confirmButtonColor: "#dc3545",
         }).then(function (result) {
             if (result.isConfirmed) {
-                window.location.href = "/crud/eliminarEstudiante/" + idEstudiante + "/";
+                window.location.href = "/crud/eliminarColegio/" + idGrado + "/";
             }
         });
     }
@@ -26,7 +26,7 @@
     <head>
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>Lista Estudiante</title>
+        <title>Lista Colegio</title>
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet"
             integrity="sha384-giJF6kkoqNQ00vy+HMDP7azOuL0xtbfIcaT9wjKHr8RbDVddVHyTfAAsrekwKmP1"
             crossorigin="anonymous" />
@@ -38,20 +38,20 @@
             <div class="row">
                 <div class="col-md-12">
                     <div class="row">
-                        <div class="col-5">
-                            <h2>Listado de Estudiante</h2>
+                        <div class="col-6">
+                            <h2>Listado de Colegio</h2>
                         </div>
                         <div class="col-4">
-                            <form class="d-flex" method="GET">
+                            <!--<form class="d-flex" method="GET">
                                 <div class="input-group">
                                     <input type="text" class="form-control" placeholder="Buscar" name="buscar"
                                         value="{{ query }}" aria-label="Search">
                                     <button class="btn btn-outline-success" type="submit">Buscar</button>
                                 </div>
-                            </form>
+                            </form>-->
                         </div>
-                        <div class="col-3">
-                            <a href="{% url 'agregarEstudiante' %}" class="btn btn-success w-100">Agregar Estudiante</a>
+                        <div class="col-2">
+                            <a href="{% url 'agregarColegio' %}" class="btn btn-success">Agregar Colegio</a>
                         </div>
                     </div>
                     <div class="table-responsive">
@@ -59,39 +59,33 @@
                             <thead>
                                 <tr>
                                     <th>#</th>
-                                    <th>DOCUMENTO</th>
+                                    <th>ID</th>
                                     <th>NOMBRE</th>
-                                    <th>EDAD</th>
-                                    <th>F1</th>
-                                    <th>F2</th>
-                                    <th>F3</th>
-                                    <th>IDCOLEGIO</th>
-                                    <th>IDGRADO</th>
+                                    <th>DIRECCION</th>
+                                    <th>TELEFONO</th>
+                                    <th>EMAIL</th>
                                     <th>OPCIONES</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                {% if estudiante %}
-                                {% for estudiante in estudiante %}
+                                {% if colegio %}
+                                {% for colegio in colegio %}
                                 <tr>
                                     <td class="">{{ forloop.counter }}</td>
-                                    <td class="">{{ estudiante.documento }}</td>
-                                    <td class="">{{ estudiante.nombre }} {{ estudiante.apellido }}</td>
-                                    <td class="">{{ estudiante.edad }}</td>
-                                    <td class="">{{ estudiante.faltasTipo1 }}</td>
-                                    <td class="">{{ estudiante.faltasTipo2 }}</td>
-                                    <td class="">{{ estudiante.faltasTipo3 }}</td>
-                                    <td class="">{{ estudiante.idColegio }}</td>
-                                    <td class="">{{ estudiante.idGrado }}</td>
+                                    <td class="">{{ colegio.idColegio }}</td>
+                                    <td class="">{{ colegio.nombre }}</td>
+                                    <td class="">{{ colegio.direccion }}</td>
+                                    <td class="">{{ colegio.telefono }}</td>
+                                    <td class="">{{ colegio.email }}</td>
                                     <td>
                                         <div class="btn-group btn-group-sm" role="group" aria-label="Basic example">
                                             <!-- Botón Modificar -->
-                                            <a href="{% url 'modificarEstudiante' estudiante.idEstudiante %}"
+                                            <a href="{% url 'modificarColegio' colegio.idColegio %}"
                                                 class="btn btn-info btn-sm">
                                                 Modificar
                                             </a>
                                             <!-- Botón Eliminar -->
-                                            <a href="#" onclick="eliminarEstudiante({{ estudiante.idEstudiante }})"
+                                            <a href="#" onclick="eliminarColegio({{ colegio.idColegio }})"
                                                 class="btn btn-danger btn-sm">
                                                 Eliminar
                                             </a>

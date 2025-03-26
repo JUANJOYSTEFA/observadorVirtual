@@ -1,4 +1,4 @@
-{% extends "index.html" %}
+{% extends "../index.html" %}
 {% load static %}
 <!DOCTYPE html>
 <html lang="en">
@@ -26,7 +26,7 @@
 						<br>
 						<br>
 						<div class="d-flex justify-content-end">
-							<input type="reset" value="Cancelar" class="btn btn-secondary">
+							<a href="{% url 'listaColegio' %}" class="btn btn-secondary">Cancelar</a>
 							&nbsp;&nbsp;
 							<input type="submit" value="Guardar" class="btn btn-primary">
 						</div>

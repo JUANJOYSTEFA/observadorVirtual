@@ -1,11 +1,11 @@
-{% extends "index.html" %}
+{% extends "../index.html" %}
 {% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<title>Agregar Grado</title>
+	<title>Agregar Acudiente</title>
 	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
 
 </head>
@@ -17,7 +17,7 @@
 			<div class="card">
 				<div class="card-body">
 					<!--{% load crispy_forms_tags %}-->
-					<h2>Nuevo Grado</h2>
+					<h2>Nuevo Acudiente</h2>
 					
 					<form  action="" method="POST" class="card p-3 mt-5"  enctype="multipart/form-data" class="form"> 
 						{% csrf_token %}
@@ -26,7 +26,7 @@
 						<br>
 						<br>
 						<div class="d-flex justify-content-end">
-							<input type="reset" value="Cancelar" class="btn btn-secondary">
+							<a href="{% url 'listaAcudiente' %}" class="btn btn-secondary">Cancelar</a>
 							&nbsp;&nbsp;
 							<input type="submit" value="Guardar" class="btn btn-primary">
 						</div>
