@@ -24,5 +24,17 @@ urlpatterns = [
     path('agregarAdministrativo/', agregarAdministrativo, name="agregarAdministrativo"),
     path('modificarAdministrativo/<idAdministrativo>/', modificarAdministrativo, name="modificarAdministrativo"),
     path('eliminarAdministrativo/<idAdministrativo>/', eliminarAdministrativo, name="eliminarAdministrativo"),
+    path('listaFalta/', listaFalta, name='listaFalta'),
+    path('agregarFalta/', agregarFalta, name="agregarFalta"),
+    path('modificarFalta/<idFalta>/', modificarFalta, name="modificarFalta"),
+    path('eliminarFalta/<idFalta>/', eliminarFalta, name="eliminarFalta"),
+    path('listaObservacion/', listaObservacion, name='listaObservacion'),
+    path('agregarObservacion/', agregarObservacion, name="agregarObservacion"),
+    path('modificarObservacion/<idObservacion>/', modificarObservacion, name="modificarObservacion"),
+    path('eliminarObservacion/<idObservacion>/', eliminarObservacion, name="eliminarObservacion"),
+    path('listaCitacion/', listaCitacion, name='listaCitacion'),
+    path('agregarCitacion/', agregarCitacion, name="agregarCitacion"),
+    path('modificarCitacion/<idCitacion>/', modificarCitacion, name="modificarCitacion"),
+    path('eliminarCitacion/<idCitacion>/', eliminarCitacion, name="eliminarCitacion"),
 
 ]

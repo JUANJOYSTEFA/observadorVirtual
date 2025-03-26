@@ -120,7 +120,6 @@ class Observacion(models.Model):
     idFalta = models.ForeignKey(Faltas, on_delete=models.CASCADE, related_name="observaciones")
     idEstudiante = models.ForeignKey(Estudiante, on_delete=models.CASCADE, related_name="observaciones")
     idAdministrativo = models.ForeignKey(Administrativos, on_delete=models.CASCADE, related_name="observaciones")
-    idGrado = models.ForeignKey(Grado, on_delete=models.CASCADE, related_name="observaciones")
     fecha = models.DateField()
     hora = models.TimeField()
     comentario = models.TextField(max_length=1000)

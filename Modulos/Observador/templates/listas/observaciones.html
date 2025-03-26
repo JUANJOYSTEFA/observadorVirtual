@@ -2,7 +2,7 @@
 {% load static %}
 {% block js %}
 <script>
-    function eliminarAcudiente(idAcudiente) {
+    function eliminarObservacion(idObservacion) {
         Swal.fire({
             title: "¿Estas seguro?",
             text: "Esta acción no se puede deshacer",
@@ -14,7 +14,7 @@
             confirmButtonColor: "#dc3545",
         }).then(function (result) {
             if (result.isConfirmed) {
-                window.location.href = "/crud/eliminarAcudiente/" + idAcudiente + "/";
+                window.location.href = "/crud/eliminarObservacion/" + idObservacion + "/";
             }
         });
     }
@@ -26,7 +26,7 @@
     <head>
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>Lista Acudiente</title>
+        <title>Lista Observacion</title>
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet"
             integrity="sha384-giJF6kkoqNQ00vy+HMDP7azOuL0xtbfIcaT9wjKHr8RbDVddVHyTfAAsrekwKmP1"
             crossorigin="anonymous" />
@@ -39,19 +39,19 @@
                 <div class="col-md-12">
                     <div class="row">
                         <div class="col-5">
-                            <h2>Listado de Acudiente</h2>
+                            <h2>Listado de Observacion</h2>
                         </div>
                         <div class="col-4">
-                            <form class="d-flex" method="GET">
+                            <!--<form class="d-flex" method="GET">
                                 <div class="input-group">
                                     <input type="text" class="form-control" placeholder="Buscar" name="buscar"
                                         value="{{ query }}" aria-label="Search">
                                     <button class="btn btn-outline-success" type="submit">Buscar</button>
                                 </div>
-                            </form>
+                            </form>-->
                         </div>
                         <div class="col-3">
-                            <a href="{% url 'agregarAcudiente' %}" class="btn btn-success">Agregar Acudiente</a>
+                            <a href="{% url 'agregarObservacion' %}" class="btn btn-success">Agregar Observacion</a>
                         </div>
                     </div>
                     <div class="table-responsive">
@@ -59,33 +59,37 @@
                             <thead>
                                 <tr>
                                     <th>#</th>
-                                    <th>DOCUMENTO</th>
-                                    <th>NOMBRE</th>
-                                    <th>TELEFONO</th>
-                                    <th>EMAIL</th>
-                                    <th>IDESTUDIANTE</th>
+                                    <th>ID</th>
+                                    <th>FALTA</th>
+                                    <th>ESTUDIANTE</th>
+                                    <th>ADMINISTRATIVO</th>
+                                    <th>FECHA</th>
+                                    <th>HORA</th>
+                                    <th>COMENTARIO</th>
                                     <th>OPCIONES</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                {% if acudiente %}
-                                {% for acudiente in acudiente %}
+                                {% if observacion %}
+                                {% for observacion in observacion %}
                                 <tr>
                                     <td class="">{{ forloop.counter }}</td>
-                                    <td class="">{{ acudiente.documento }}</td>
-                                    <td class="">{{ acudiente.nombre }} {{ acudiente.apellido }}</td>
-                                    <td class="">{{ acudiente.telefono }}</td>
-                                    <td class="">{{ acudiente.correo }}</td>
-                                    <td class="">{{ acudiente.idEstudiante }}</td>
+                                    <td class="">{{ observacion.idObservacion }}</td>
+                                    <td class="">{{ observacion.idFalta }}</td>
+                                    <td class="">{{ observacion.idEstudiante }}</td>
+                                    <td class="">{{ observacion.idAdministrativo }}</td>
+                                    <td class="">{{ observacion.fecha }}</td>
+                                    <td class="">{{ observacion.hora }}</td>
+                                    <td class="">{{ observacion.comentario }}</td>
                                     <td>
                                         <div class="btn-group btn-group-sm" role="group" aria-label="Basic example">
                                             <!-- Botón Modificar -->
-                                            <a href="{% url 'modificarAcudiente' acudiente.idAcudiente %}"
+                                            <a href="{% url 'modificarObservacion' observacion.idObservacion %}"
                                                 class="btn btn-info btn-sm">
                                                 Modificar
                                             </a>
                                             <!-- Botón Eliminar -->
-                                            <a href="#" onclick="eliminarAcudiente({{ acudiente.idAcudiente }})"
+                                            <a href="#" onclick="eliminarObservacion({{ observacion.idObservacion }})"
                                                 class="btn btn-danger btn-sm">
                                                 Eliminar
                                             </a>
