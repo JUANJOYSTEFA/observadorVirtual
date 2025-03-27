@@ -1,3 +1,5 @@
+from .models import Observacion, Estudiante
+from django.shortcuts import get_object_or_404, redirect
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.views import LoginView
 from django.views.generic import TemplateView
@@ -27,10 +29,9 @@ class LoginFormView(LoginView):
 
 
 def listaColegio(request):
-    query = request.GET.get('buscar', '')
-    logger.info(f"🔍 Búsqueda recibida: {query}")  # Esto se verá en la consola
-
+    query = request.GET.get("buscar", "")  # Obtener el valor del input
     colegios = Colegio.objects.all()
+
     if query:
         colegios = colegios.filter(
             Q(nombre__icontains=query) |
@@ -39,9 +40,7 @@ def listaColegio(request):
             Q(email__icontains=query)
         )
 
-    # Muestra el QuerySet filtrado
-    logger.info(f"📄 Registros encontrados: {colegios}")
-    return render(request, 'listas/colegios.html', {'colegio': colegios, 'query': query})
+    return render(request, "listas/colegios.html", {"colegio": colegios, "query": query})
 
 
 def agregarColegio(request):
@@ -92,8 +91,17 @@ def eliminarColegio(request, idColegio):
 
 
 def listaGrado(request):
-    grados = Grado.objects.all()  # Obtiene todos los registros
-    return render(request, 'listas/grados.html', {'grado': grados})
+    query = request.GET.get("buscar", "")  # Obtener el valor del input
+    grados = Grado.objects.all()
+
+    if query:
+        grados = grados.filter(
+            Q(grado__icontains=query) |
+            Q(ciclo__icontains=query) |
+            Q(idColegio__nombre__icontains=query)
+        )
+
+    return render(request, 'listas/grados.html', {'grado': grados, "query": query})
 
 
 def agregarGrado(request):
@@ -144,8 +152,26 @@ def eliminarGrado(request, idGrado):
 
 
 def listaEstudiante(request):
-    estudiante = Estudiante.objects.all()  # Obtiene todos los registros
-    return render(request, 'listas/estudiantes.html', {'estudiante': estudiante})
+    query = request.GET.get("buscar", "")  # Obtener el valor del input
+    estudiante = Estudiante.objects.all()
+
+    if query:
+        estudiante = estudiante.filter(
+            Q(tipoDocumento__icontains=query) |
+            Q(documento__icontains=query) |
+            Q(nombre__icontains=query) |
+            Q(apellido__icontains=query) |
+            Q(edad__icontains=query) |
+            Q(correo__icontains=query) |
+            Q(faltasTipo1__icontains=query) |
+            Q(faltasTipo2__icontains=query) |
+            Q(faltasTipo3__icontains=query) |
+            Q(idColegio__nombre__icontains=query) |
+            Q(idGrado__grado__icontains=query) |
+            Q(idGrado__ciclo__icontains=query)
+        )
+
+    return render(request, 'listas/estudiantes.html', {'estudiante': estudiante, "query": query})
 
 
 def agregarEstudiante(request):
@@ -196,8 +222,23 @@ def eliminarEstudiante(request, idEstudiante):
 
 
 def listaAcudiente(request):
-    acudiente = Acudiente.objects.all()  # Obtiene todos los registros
-    return render(request, 'listas/acudientes.html', {'acudiente': acudiente})
+    query = request.GET.get("buscar", "")  # Obtener el valor del input
+    acudiente= Acudiente.objects.all() #Obtiene todos los registros
+
+    if query:
+        acudiente = acudiente.filter( #Filtra por cada campo
+            Q(tipoDocumento__icontains=query) |
+            Q(documento__icontains=query) |
+            Q(nombre__icontains=query) |
+            Q(apellido__icontains=query) |
+            Q(telefono__icontains=query) |
+            Q(correo__icontains=query) |
+            Q(idEstudiante__nombre__icontains=query) |
+            Q(idEstudiante__apellido__icontains=query) |
+            Q(idEstudiante__correo__icontains=query)
+        )
+
+    return render(request, 'listas/acudientes.html', {'acudiente': acudiente, "query": query})
 
 
 def agregarAcudiente(request):
@@ -248,9 +289,20 @@ def eliminarAcudiente(request, idAcudiente):
 
 
 def listaAdministrativo(request):
+    query = request.GET.get("buscar", "")  # Obtener el valor del input
     administrativos = Administrativos.objects.all()  # Obtiene todos los registros
-    return render(request, 'listas/administrativos.html', {'administrativo': administrativos})
 
+    if query:
+        administrativos = administrativos.filter(  # Filtra por cada campo
+            Q(nombre__icontains=query) |
+            Q(apellido__icontains=query) |
+            Q(cargo__icontains=query) |
+            Q(ciclo__icontains=query) |
+            Q(correo__icontains=query) |
+            Q(idColegio__nombre__icontains=query)
+        )
+
+    return render(request, 'listas/administrativos.html', {'administrativo': administrativos, "query": query})
 
 def agregarAdministrativo(request):
     data = {
@@ -303,8 +355,18 @@ def eliminarAdministrativo(request, idAdministrativo):
 
 
 def listaFalta(request):
+    query = request.GET.get("buscar", "")  # Obtener el valor del input
     faltas = Faltas.objects.all()  # Obtiene todos los registros
-    return render(request, 'listas/faltas.html', {'falta': faltas})
+
+    if query:
+        faltas = faltas.filter(  # Filtra por cada campo
+            Q(tipoFalta__icontains=query) |
+            Q(falta__icontains=query) |
+            Q(descripcion__icontains=query) |
+            Q(idColegio__nombre__icontains=query)
+        )
+
+    return render(request, 'listas/faltas.html', {'falta': faltas, "query": query})
 
 
 def agregarFalta(request):
@@ -356,8 +418,26 @@ def eliminarFalta(request, idFalta):
 
 
 def listaObservacion(request):
-    observaciones = Observacion.objects.all()  # Obtiene todos los registros
-    return render(request, 'listas/observaciones.html', {'observacion': observaciones})
+    query = request.GET.get("buscar", "")  # Obtener el valor del input
+    observaciones = Observacion.objects.all()  # Obtiene todos los registro
+
+    if query:
+        observaciones = observaciones.filter(  # Filtra por cada campo
+            Q(fecha__icontains=query) |
+            Q(hora__icontains=query) |
+            Q(comentario__icontains=query) |
+            Q(idFalta__tipoFalta__icontains=query) |
+            Q(idFalta__falta__icontains=query) |
+            Q(idFalta__descripcion__icontains=query) |
+            Q(idEstudiante__nombre__icontains = query) |
+            Q(idEstudiante__apellido__icontains = query) |
+            Q(idEstudiante__correo__icontains=query) |
+            Q(idAdministrativo__nombre__icontains=query) |
+            Q(idAdministrativo__apellido__icontains=query)
+        )
+
+    return render(request, 'listas/observaciones.html', {'observacion': observaciones, "query": query})
+
 
 
 def agregarObservacion(request):
@@ -368,13 +448,28 @@ def agregarObservacion(request):
     if request.method == 'POST':
         formulario = ObservacionForm(data=request.POST, files=request.FILES)
         if formulario.is_valid():
-            formulario.save()
-            messages.success(request, "Guardado Correctamente")
+            observacion = formulario.save()  # Guardar la observación y obtener el objeto
+
+            estudiante = observacion.idEstudiante  # Obtener el estudiante
+            tipo_falta = observacion.idFalta.tipoFalta  # Obtener el tipo de falta
+
+            # Incrementar el campo correspondiente en el estudiante
+            if tipo_falta == 1:
+                estudiante.faltasTipo1 += 1
+            elif tipo_falta == 2:
+                estudiante.faltasTipo2 += 1
+            elif tipo_falta == 3:
+                estudiante.faltasTipo3 += 1
+
+            estudiante.save()  # Guardar los cambios en el estudiante
+
+            messages.success(
+                request, "Guardado Correctamente y falta registrada")
             return redirect('listaObservacion')
         else:
             data["form"] = formulario
             messages.warning(request, "El archivo ya existe")
-            # data["mensaje"]="el archivo ya existe"
+
     return render(request, 'agregar/observacion.html', data)
 
 
@@ -403,14 +498,47 @@ def modificarObservacion(request, idObservacion):
 
 def eliminarObservacion(request, idObservacion):
     observacion = get_object_or_404(Observacion, idObservacion=idObservacion)
-    observacion.delete()
-    messages.success(request, "Eliminado Correctamente")
+
+    estudiante = observacion.idEstudiante  # Obtener el estudiante relacionado
+    tipo_falta = observacion.idFalta.tipoFalta  # Obtener el tipo de falta
+
+    # Restar la falta correspondiente, asegurando que no sea menor que 0
+    if tipo_falta == 1 and estudiante.faltasTipo1 > 0:
+        estudiante.faltasTipo1 -= 1
+    elif tipo_falta == 2 and estudiante.faltasTipo2 > 0:
+        estudiante.faltasTipo2 -= 1
+    elif tipo_falta == 3 and estudiante.faltasTipo3 > 0:
+        estudiante.faltasTipo3 -= 1
+
+    estudiante.save()  # Guardar los cambios en el estudiante
+
+    observacion.delete()  # Eliminar la observación
+    messages.success(
+        request, "Observación eliminada y falta descontada correctamente")
+
     return redirect(to="listaObservacion")
 
 
+
 def listaCitacion(request):
-    citaciones = Citaciones.objects.all()  # Obtiene todos los registros
-    return render(request, 'listas/citaciones.html', {'citacion': citaciones})
+    query = request.GET.get("buscar", "")  # Obtener el valor del input
+    citaciones = Citaciones.objects.all()  # Obtiene todos los registro
+
+    if query:
+        citaciones = citaciones.filter(  # Filtra por cada campo
+            Q(fecha__icontains=query) |
+            Q(hora__icontains=query) |
+            Q(asistencia__icontains=query) |
+            Q(idEstudiante__nombre__icontains = query) |
+            Q(idEstudiante__apellido__icontains = query) |
+            Q(idEstudiante__correo__icontains=query) |
+            Q(idEstudiante__correo__icontains=query) |
+            Q(idAcudiente__nombre__icontains=query) |
+            Q(idAcudiente__apellido__icontains=query) |
+            Q(idAcudiente__correo__icontains=query)
+        )
+
+    return render(request, 'listas/citaciones.html', {'citacion': citaciones, "query": query})
 
 
 def agregarCitacion(request):

@@ -42,13 +42,13 @@
                             <h2>Listado de Citaciones</h2>
                         </div>
                         <div class="col-4">
-                            <!--<form class="d-flex" method="GET">
+                            <form class="d-flex" method="GET">
                                 <div class="input-group">
                                     <input type="text" class="form-control" placeholder="Buscar" name="buscar"
                                         value="{{ query }}" aria-label="Search">
                                     <button class="btn btn-outline-success" type="submit">Buscar</button>
                                 </div>
-                            </form>-->
+                            </form>
                         </div>
                         <div class="col-3">
                             <a href="{% url 'agregarCitacion' %}" class="btn btn-success">Agregar Citacion</a>
@@ -62,7 +62,9 @@
                                     <th>ID</th>
                                     <th>FECHA</th>
                                     <th>HORA</th>
-                                    <th>ESTUDIANTE Y ACUDIENTE</th>
+                                    <th>ESTUDIANTE</th>
+                                    <th>ACUDIENTE</th>
+                                    <th>ASISTENCIA</th>
                                     <th>OPCIONES</th>
                                 </tr>
                             </thead>
@@ -74,7 +76,9 @@
                                     <td class="">{{ citacion.idCitacion }}</td>
                                     <td class="">{{ citacion.fecha }}</td>
                                     <td class="">{{ citacion.hora }}</td>
+                                    <td class="">{{ citacion.idEstudiante }}</td>
                                     <td class="">{{ citacion.idAcudiente }}</td>
+                                    <td class="">{{ citacion.asistencia }}</td>
                                     <td>
                                         <div class="btn-group btn-group-sm" role="group" aria-label="Basic example">
                                             <!-- Botón Modificar -->
@@ -93,7 +97,7 @@
                                 {% endfor %}
                                 {% else %}
                                 <tr>
-                                    <td colspan="6" class="text-center text-danger">⚠ No se encontraron resultados</td>
+                                    <td colspan="8" class="text-center text-danger">⚠ No se encontraron resultados</td>
                                 </tr>
                                 {% endif %}
                             </tbody>

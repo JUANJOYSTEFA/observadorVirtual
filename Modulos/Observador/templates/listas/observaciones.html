@@ -42,13 +42,13 @@
                             <h2>Listado de Observacion</h2>
                         </div>
                         <div class="col-4">
-                            <!--<form class="d-flex" method="GET">
+                            <form class="d-flex" method="GET">
                                 <div class="input-group">
                                     <input type="text" class="form-control" placeholder="Buscar" name="buscar"
                                         value="{{ query }}" aria-label="Search">
                                     <button class="btn btn-outline-success" type="submit">Buscar</button>
                                 </div>
-                            </form>-->
+                            </form>
                         </div>
                         <div class="col-3">
                             <a href="{% url 'agregarObservacion' %}" class="btn btn-success">Agregar Observacion</a>
@@ -99,7 +99,7 @@
                                 {% endfor %}
                                 {% else %}
                                 <tr>
-                                    <td colspan="6" class="text-center text-danger">⚠ No se encontraron resultados</td>
+                                    <td colspan="9" class="text-center text-danger">⚠ No se encontraron resultados</td>
                                 </tr>
                                 {% endif %}
                             </tbody>

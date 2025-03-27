@@ -42,13 +42,13 @@
                             <h2>Listado de Estudiante</h2>
                         </div>
                         <div class="col-4">
-                            <!--<form class="d-flex" method="GET">
+                            <form class="d-flex" method="GET">
                                 <div class="input-group">
                                     <input type="text" class="form-control" placeholder="Buscar" name="buscar"
                                         value="{{ query }}" aria-label="Search">
                                     <button class="btn btn-outline-success" type="submit">Buscar</button>
                                 </div>
-                            </form>-->
+                            </form>
                         </div>
                         <div class="col-3">
                             <a href="{% url 'agregarEstudiante' %}" class="btn btn-success">Agregar Estudiante</a>
@@ -62,11 +62,12 @@
                                     <th>DOCUMENTO</th>
                                     <th>NOMBRE</th>
                                     <th>EDAD</th>
+                                    <th>CORREO</th>
                                     <th>F1</th>
                                     <th>F2</th>
                                     <th>F3</th>
-                                    <th>IDCOLEGIO</th>
-                                    <th>IDGRADO</th>
+                                    <th>COLEGIO</th>
+                                    <th>GRADO</th>
                                     <th>OPCIONES</th>
                                 </tr>
                             </thead>
@@ -78,6 +79,7 @@
                                     <td class="">{{ estudiante.documento }}</td>
                                     <td class="">{{ estudiante.nombre }} {{ estudiante.apellido }}</td>
                                     <td class="">{{ estudiante.edad }}</td>
+                                    <td class="">{{ estudiante.correo }}</td>
                                     <td class="">{{ estudiante.faltasTipo1 }}</td>
                                     <td class="">{{ estudiante.faltasTipo2 }}</td>
                                     <td class="">{{ estudiante.faltasTipo3 }}</td>
@@ -101,7 +103,7 @@
                                 {% endfor %}
                                 {% else %}
                                 <tr>
-                                    <td colspan="6" class="text-center text-danger">⚠ No se encontraron resultados</td>
+                                    <td colspan="11" class="text-center text-danger">⚠ No se encontraron resultados</td>
                                 </tr>
                                 {% endif %}
                             </tbody>
