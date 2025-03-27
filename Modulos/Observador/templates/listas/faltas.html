@@ -42,13 +42,13 @@
                             <h2>Listado de Falta</h2>
                         </div>
                         <div class="col-4">
-                            <!--<form class="d-flex" method="GET">
+                            <form class="d-flex" method="GET">
                                 <div class="input-group">
                                     <input type="text" class="form-control" placeholder="Buscar" name="buscar"
                                         value="{{ query }}" aria-label="Search">
                                     <button class="btn btn-outline-success" type="submit">Buscar</button>
                                 </div>
-                            </form>-->
+                            </form>
                         </div>
                         <div class="col-3">
                             <a href="{% url 'agregarFalta' %}" class="btn btn-success">Agregar Falta</a>
@@ -63,7 +63,7 @@
                                     <th>TIPO</th>
                                     <th>FALTA</th>
                                     <th>DESCRIPCIÓN</th>
-                                    <th>IDCOLEGIO</th>
+                                    <th>COLEGIO</th>
                                     <th>OPCIONES</th>
                                 </tr>
                             </thead>
@@ -95,7 +95,7 @@
                                 {% endfor %}
                                 {% else %}
                                 <tr>
-                                    <td colspan="6" class="text-center text-danger">⚠ No se encontraron resultados</td>
+                                    <td colspan="7" class="text-center text-danger">⚠ No se encontraron resultados</td>
                                 </tr>
                                 {% endif %}
                             </tbody>

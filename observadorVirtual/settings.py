@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'Modulos.Observador',
     'bootstrap5',
     'crispy_forms',
+    'crispy_bootstrap5',
 ]
 
 MIDDLEWARE = [
@@ -73,6 +74,7 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'observadorVirtual.wsgi.application'
+CRISPY_TEMPLATE_PACK = 'bootstrap5'
 
 
 # Database
