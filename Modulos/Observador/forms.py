@@ -1,6 +1,5 @@
 from django import forms
-from .models import *
-
+from .models import Colegio, Grado, Estudiante, Acudiente, Administrativos, Faltas, Observacion, Citaciones
 
 class ColegioForm(forms.ModelForm):
 
