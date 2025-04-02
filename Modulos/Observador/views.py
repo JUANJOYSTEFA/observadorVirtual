@@ -587,3 +587,7 @@ def eliminarCitacion(request, idCitacion):
     citaciones.delete()
     messages.success(request, "Eliminado Correctamente")
     return redirect(to="listaCitacion")
+
+def observadorEstudianteLibro(request, idEstudiante):
+    estudiante = get_object_or_404(Estudiante, idEstudiante=idEstudiante)
+    return render(request, 'observador/libro.html', {"estudiante":estudiante})

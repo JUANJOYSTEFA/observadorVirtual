@@ -36,5 +36,4 @@ urlpatterns = [
     path('agregarCitacion/', agregarCitacion, name="agregarCitacion"),
     path('modificarCitacion/<idCitacion>/', modificarCitacion, name="modificarCitacion"),
     path('eliminarCitacion/<idCitacion>/', eliminarCitacion, name="eliminarCitacion"),
-
 ]

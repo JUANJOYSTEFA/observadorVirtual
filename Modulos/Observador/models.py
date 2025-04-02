@@ -1,5 +1,4 @@
 from django.db import models
-import datetime
 
 class Colegio(models.Model):
     idColegio = models.AutoField(primary_key=True)
@@ -9,7 +8,7 @@ class Colegio(models.Model):
     email = models.EmailField(max_length=100)
 
     def __str__(self):
-        return f"{self.nombre} ({self.idColegio})"
+        return f"idColegio: {self.idColegio}, Nombre: {self.nombre}"
 
     class Meta:
         verbose_name = 'Colegio'
@@ -23,7 +22,7 @@ class Grado(models.Model):
     idColegio = models.ForeignKey(Colegio, on_delete=models.CASCADE, related_name="grado", default= 1)
 
     def __str__(self):
-        return f"{self.grado} ({self.ciclo})"
+        return f"Ciclo: {self.ciclo}, Grado: {self.grado}"
 
 
 class Estudiante(models.Model):
@@ -47,7 +46,7 @@ class Estudiante(models.Model):
     idGrado = models.ForeignKey(Grado, on_delete=models.CASCADE, null=True, blank=True)
 
     def __str__(self):
-        return f"{self.tipoDocumento} {self.documento}, {self.apellido} {self.nombre} ({self.idEstudiante})"
+        return f"{self.idEstudiante}, {self.apellido} {self.nombre}, Identificación: {self.tipoDocumento} {self.documento}"
 
     class Meta:
         verbose_name = 'Estudiante'
@@ -70,8 +69,7 @@ class Acudiente(models.Model):
     idEstudiante = models.ForeignKey(Estudiante, on_delete=models.CASCADE, related_name="acudientes")
 
     def __str__(self):
-        return f"{self.nombre} {self.apellido} ({self.idAcudiente if self.idAcudiente else 'Sin ID'})"
-
+        return f"Estudiante: {self.idEstudiante}, Nombre Acudiente: {self.apellido} {self.nombre}"
 
     class Meta:
         verbose_name = 'Acudiente'
@@ -82,26 +80,19 @@ class Administrativos(models.Model):
     apellido = models.CharField(max_length=100)
 
     cargos = [  # Lista de tuplas para choices
-        ('Profesor', 'Profesor'),
-        ('Directivo', 'Directivo'),
+        ('profesor', 'Profesor'),
+        ('directivo', 'Directivo'),
     ]
     
-    cargo = models.CharField(max_length=9, choices=cargos, default='Profesor')
-
-    ciclos = [  # Lista de tuplas para choices
-        ('Ciclo Inicial', 'Ciclo Inicial'),
-        ('Ciclo 1', 'Ciclo 1'),
-        ('Ciclo 2', 'Ciclo 2'),
-        ('Ciclo 3', 'Ciclo 3'),
-        ('Ciclo 4', 'Ciclo 4'),
-    ]
-
-    ciclo = models.CharField(max_length=13, choices=ciclos, default='Ciclo Inicial')
+    cargo = models.CharField(max_length=9, choices=cargos, default='profesor')
+    ciclo = models.CharField(max_length=12, null=True, blank=True)
     correo = models.EmailField(max_length=100)
     contrasena = models.CharField(max_length=100)
-    idColegio = models.ForeignKey(Colegio, on_delete=models.CASCADE, related_name="administrativos", default= 1)
+
     def __str__(self):
-        return f"{self.cargo} {self.nombre} {self.apellido} ({self.idAdministrativo})"
+        if self.cargo == 'profesor' and self.ciclo:
+            return f"idAdministrativo: {self.idAdministrativo}, Nombre: {self.nombre} {self.apellido}, Cargo: {self.cargo}, Ciclo: {self.ciclo}"
+        return f"idAdministrativo: {self.idAdministrativo}, Nombre: {self.nombre} {self.apellido}, Cargo: {self.cargo}"
 
 
     class Meta:
@@ -130,8 +121,8 @@ class Observacion(models.Model):
     idFalta = models.ForeignKey(Faltas, on_delete=models.CASCADE, related_name="observaciones")
     idEstudiante = models.ForeignKey(Estudiante, on_delete=models.CASCADE, related_name="observaciones")
     idAdministrativo = models.ForeignKey(Administrativos, on_delete=models.CASCADE, related_name="observaciones")
-    fecha = models.DateField(default=datetime.date.today)
-    hora = models.TimeField(default=lambda: datetime.datetime.now().time())
+    fecha = models.DateField()
+    hora = models.TimeField()
     comentario = models.TextField(max_length=1000)
 
     def __str__(self):
@@ -146,7 +137,6 @@ class Citaciones(models.Model):
     hora = models.TimeField()
     idAcudiente = models.ForeignKey(Acudiente, on_delete=models.CASCADE, related_name="citaciones")
     idEstudiante = models.ForeignKey(Estudiante, on_delete=models.CASCADE, related_name="citaciones")
-    asistencia = models.BooleanField(default=False)
 
     def __str__(self):
         return f"Fecha: {self.fecha} {self.hora}, {self.idAcudiente}"
