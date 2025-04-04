@@ -1,3 +1,4 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -120,7 +121,7 @@
         <div class="page cover current" id="cover">
           <div class="page-content">
             <h1 class="mb-4">Observador Virtual</h1>
-            <img src="/api/placeholder/200/200" alt="Foto del Estudiante" class="student-photo">
+            <img src="{% static estudiante.urlImagenPerfil %}" class="student-photo">
             <div class="student-info mt-3">
               <h2>{{estudiante.nombre}} {{estudiante.apellido}}</h2>
               <p class="lead">Grado: {{estudiante.idGrado.grado}}</p>
@@ -143,22 +144,22 @@
                   <p>15 de marzo de 2008</p>
                 </div>
                 <div class="mb-3">
-                  <strong>ID Estudiante:</strong>
-                  <p>EST20240217</p>
+                  <strong>Correo Electrónico:</strong>
+                  <p>{{estudiante.correo}}</p>
                 </div>
               </div>
               <div class="col-md-6">
                 <div class="mb-3">
-                  <strong>Dirección:</strong>
-                  <p>Calle Principal #123, Ciudad</p>
+                  <strong>Nombre del Acudiente:</strong>
+                  <p>{{acudiente.nombre}} {{acudiente.apellido}}</p>
                 </div>
                 <div class="mb-3">
-                  <strong>Teléfono:</strong>
-                  <p>(123) 456-7890</p>
+                  <strong>Teléfono del Acudiente:</strong>
+                  <p>{{acudiente.telefono}}</p>
                 </div>
                 <div class="mb-3">
-                  <strong>Correo Electrónico:</strong>
-                  <p>{{estudiante.correo}}</p>
+                  <strong>Correo Electrónico del Acudiente:</strong>
+                  <p>{{acudiente.correo}}</p>
                 </div>
               </div>
             </div>

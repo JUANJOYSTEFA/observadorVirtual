@@ -1,10 +1,12 @@
+import os
 from .models import Observacion, Estudiante
-from django.shortcuts import get_object_or_404, redirect
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.views import LoginView
 from django.views.generic import TemplateView
 from django.db.models import Q
 from django.contrib import messages
+from django.conf import settings
+from django.core.files.storage import default_storage
 from .models import *
 from .forms import *
 import logging
@@ -182,13 +184,28 @@ def agregarEstudiante(request):
     if request.method == 'POST':
         formulario = EstudianteForm(data=request.POST, files=request.FILES)
         if formulario.is_valid():
-            formulario.save()
+            estudiante = formulario.save(commit=False)
+
+            imagen = request.FILES.get('imagen')
+            if imagen:
+                # Ruta de destino dentro de static
+                ruta_guardado = os.path.join('static', 'img', 'estudiantes', imagen.name)
+                ruta_absoluta = os.path.join(settings.BASE_DIR, ruta_guardado)
+
+                # Guarda la imagen manualmente
+                with open(ruta_absoluta, 'wb+') as destino:
+                    for chunk in imagen.chunks():
+                        destino.write(chunk)
+
+                # Guarda la ruta relativa en el campo
+                estudiante.urlImagenPerfil = f'img/estudiantes/{imagen.name}'
+
+            estudiante.save()
             messages.success(request, "Guardado Correctamente")
             return redirect('listaEstudiante')
         else:
             data["form"] = formulario
-            messages.warning(request, "El archivo ya existe")
-            # data["mensaje"]="el archivo ya existe"
+            messages.warning(request, "Hubo un error")
     return render(request, 'agregar/estudiante.html', data)
 
 
@@ -590,4 +607,6 @@ def eliminarCitacion(request, idCitacion):
 
 def observadorEstudianteLibro(request, idEstudiante):
     estudiante = get_object_or_404(Estudiante, idEstudiante=idEstudiante)
-    return render(request, 'observador/libro.html', {"estudiante":estudiante})
+    acudiente = get_object_or_404(Acudiente, idEstudiante=idEstudiante)
+    observacion = get_object_or_404(Observacion, idEstudiante=idEstudiante)
+    return render(request, 'observador/libro.html', {"estudiante":estudiante, "acudiente":acudiente, "observacion":observacion})

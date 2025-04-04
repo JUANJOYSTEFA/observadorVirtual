@@ -21,8 +21,10 @@ class EstudianteForm(forms.ModelForm):
             attrs={'class': 'form-control', 'id': 'password-input'}
         ),
         label="Contraseña",
-        required=False  # Para que no sea obligatorio al editar
+        required=False
     )
+    
+    imagen = forms.ImageField(required=False)  # Campo de imagen adicional
 
     class Meta:
         model = Estudiante
@@ -30,9 +32,9 @@ class EstudianteForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        # Si se está editando (el objeto ya existe)
         if self.instance and self.instance.pk:
-            self.fields.pop('contrasena', None)  # Quita el campo
+            self.fields.pop('contrasena', None)
+
 
     
 class AcudienteForm(forms.ModelForm):
