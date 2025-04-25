@@ -4,3 +4,4 @@ django-crispy-forms
 xhtml2pdf
 django-crispy-forms 
 crispy-bootstrap5
+pillow

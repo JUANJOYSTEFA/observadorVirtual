@@ -44,7 +44,7 @@ class Estudiante(models.Model):
     faltasTipo3 = models.IntegerField(default=0)
     idColegio = models.ForeignKey(Colegio, on_delete=models.CASCADE, related_name="estudiantes", default= 1)
     idGrado = models.ForeignKey(Grado, on_delete=models.CASCADE, null=True, blank=True)
-    urlImagenPerfil = models.CharField(max_length=256, default="")
+    imagen_perfil = models.ImageField(upload_to='perfiles/', blank=True, null=True)
 
     def __str__(self):
         return f"{self.idEstudiante}, {self.apellido} {self.nombre}, Identificación: {self.tipoDocumento} {self.documento}"

@@ -10,6 +10,12 @@ from django.core.files.storage import default_storage
 from .models import *
 from .forms import *
 import logging
+import time
+from PIL import Image
+from io import BytesIO
+from django.core.files.uploadedfile import InMemoryUploadedFile
+import sys
+
 logger = logging.getLogger(__name__)  # Define un logger
 
 
@@ -185,21 +191,57 @@ def agregarEstudiante(request):
         formulario = EstudianteForm(data=request.POST, files=request.FILES)
         if formulario.is_valid():
             estudiante = formulario.save(commit=False)
-
-            imagen = request.FILES.get('imagen')
-            if imagen:
-                # Ruta de destino dentro de static
-                ruta_guardado = os.path.join('static', 'img', 'estudiantes', imagen.name)
-                ruta_absoluta = os.path.join(settings.BASE_DIR, ruta_guardado)
-
-                # Guarda la imagen manualmente
-                with open(ruta_absoluta, 'wb+') as destino:
-                    for chunk in imagen.chunks():
-                        destino.write(chunk)
-
-                # Guarda la ruta relativa en el campo
-                estudiante.urlImagenPerfil = f'img/estudiantes/{imagen.name}'
-
+            
+            # Verificar si se subió una imagen
+            if 'imagen' in request.FILES:
+                imagen = request.FILES['imagen']
+                
+                # Procesar la imagen para hacerla cuadrada
+                img = Image.open(imagen)
+                
+                # Determinar el tamaño del cuadrado
+                ancho, alto = img.size
+                tamaño = min(ancho, alto)
+                
+                # Calcular coordenadas para recorte centrado
+                left = (ancho - tamaño) / 2
+                top = (alto - tamaño) / 2
+                right = (ancho + tamaño) / 2
+                bottom = (alto + tamaño) / 2
+                
+                # Recortar la imagen
+                img_recortada = img.crop((left, top, right, bottom))
+                
+                # Redimensionar a un tamaño estándar si lo deseas (opcional)
+                tamaño_final = 300  # Pixels
+                img_recortada = img_recortada.resize((tamaño_final, tamaño_final), Image.Resampling.LANCZOS)
+                
+                # Guardar en memoria
+                output = BytesIO()
+                
+                # Determinar el formato de salida
+                if img.format == 'JPEG' or img.format == 'JPG':
+                    img_recortada.save(output, format='JPEG', quality=85)
+                    extension = 'jpg'
+                else:
+                    img_recortada.save(output, format='PNG')
+                    extension = 'png'
+                    
+                output.seek(0)
+                
+                # Crear un nuevo archivo para Django
+                nueva_imagen = InMemoryUploadedFile(
+                    output,
+                    'ImageField',
+                    f"{imagen.name.split('.')[0]}_cuadrado.{extension}",
+                    'image/jpeg' if extension == 'jpg' else 'image/png',
+                    sys.getsizeof(output),
+                    None
+                )
+                
+                # Asignar la nueva imagen al estudiante
+                estudiante.imagen_perfil = nueva_imagen
+            
             estudiante.save()
             messages.success(request, "Guardado Correctamente")
             return redirect('listaEstudiante')
@@ -207,7 +249,6 @@ def agregarEstudiante(request):
             data["form"] = formulario
             messages.warning(request, "Hubo un error")
     return render(request, 'agregar/estudiante.html', data)
-
 
 def modificarEstudiante(request, idEstudiante):
     # Busca un elemento por su ID
@@ -223,7 +264,76 @@ def modificarEstudiante(request, idEstudiante):
         formulario = EstudianteForm(
             data=request.POST, instance=estudiante, files=request.FILES)
         if formulario.is_valid():
-            formulario.save()
+            estudiante = formulario.save(commit=False)
+            
+            # Verificar si se subió una nueva imagen
+            if 'imagen' in request.FILES:
+                imagen = request.FILES['imagen']
+                
+                # Procesar la imagen para hacerla cuadrada
+                img = Image.open(imagen)
+                
+                # Determinar el tamaño del cuadrado
+                ancho, alto = img.size
+                tamaño = min(ancho, alto)
+                
+                # Calcular coordenadas para recorte centrado
+                left = (ancho - tamaño) / 2
+                top = (alto - tamaño) / 2
+                right = (ancho + tamaño) / 2
+                bottom = (alto + tamaño) / 2
+                
+                # Recortar la imagen
+                img_recortada = img.crop((left, top, right, bottom))
+                
+                # Redimensionar a un tamaño estándar
+                tamaño_final = 300  # Pixels
+                img_recortada = img_recortada.resize((tamaño_final, tamaño_final), Image.Resampling.LANCZOS)
+                
+                # Guardar en memoria
+                output = BytesIO()
+                
+                # Determinar el formato de salida
+                if img.format == 'JPEG' or img.format == 'JPG':
+                    img_recortada.save(output, format='JPEG', quality=85)
+                    extension = 'jpg'
+                else:
+                    img_recortada.save(output, format='PNG')
+                    extension = 'png'
+                    
+                output.seek(0)
+                
+                # Crear un nuevo archivo para Django
+                nueva_imagen = InMemoryUploadedFile(
+                    output,
+                    'ImageField',
+                    f"{imagen.name.split('.')[0]}_cuadrado.{extension}",
+                    'image/jpeg' if extension == 'jpg' else 'image/png',
+                    sys.getsizeof(output),
+                    None
+                )
+                
+                # Si había una imagen anterior, eliminarla
+                if estudiante.imagen_perfil:
+                    try:
+                        # Guardar la ruta del archivo anterior
+                        old_image_path = estudiante.imagen_perfil.path
+                        
+                        # Asignar la nueva imagen
+                        estudiante.imagen_perfil = nueva_imagen
+                        
+                        # Si la asignación fue exitosa, eliminar el archivo antiguo
+                        import os
+                        if os.path.isfile(old_image_path):
+                            os.remove(old_image_path)
+                    except:
+                        # Si hay algún error, simplemente asignar la nueva imagen sin eliminar la antigua
+                        estudiante.imagen_perfil = nueva_imagen
+                else:
+                    # Si no había imagen anterior, simplemente asignar la nueva
+                    estudiante.imagen_perfil = nueva_imagen
+            
+            estudiante.save()
             messages.success(request, "Modificado Correctamente")
             return redirect('listaEstudiante')
 

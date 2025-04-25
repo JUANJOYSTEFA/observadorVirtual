@@ -121,7 +121,11 @@
         <div class="page cover current" id="cover">
           <div class="page-content">
             <h1 class="mb-4">Observador Virtual</h1>
-            <img src="{% static estudiante.urlImagenPerfil %}" class="student-photo">
+            {% if estudiante.imagen_perfil %}
+              <img src="{{ estudiante.imagen_perfil.url }}" alt="Foto de perfil de {{ estudiante.nombre }}" class="img-perfil" height="250px" style="border-radius: 100%;">
+            {% else %}
+              <img src="{% static 'img/default-profile.png' %}" alt="Imagen por defecto" class="img-perfil" height="250px">
+            {% endif %}
             <div class="student-info mt-3">
               <h2>{{estudiante.nombre}} {{estudiante.apellido}}</h2>
               <p class="lead">Grado: {{estudiante.idGrado.grado}}</p>

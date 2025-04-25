@@ -24,7 +24,6 @@ class EstudianteForm(forms.ModelForm):
         required=False
     )
     
-    imagen = forms.ImageField(required=False)  # Campo de imagen adicional
 
     class Meta:
         model = Estudiante
