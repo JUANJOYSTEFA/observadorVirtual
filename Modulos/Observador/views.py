@@ -192,56 +192,28 @@ def agregarEstudiante(request):
         if formulario.is_valid():
             estudiante = formulario.save(commit=False)
             
-            # Verificar si se subió una imagen
-            if 'imagen' in request.FILES:
-                imagen = request.FILES['imagen']
+            imagen = request.FILES.get('imagen')
+            if imagen:
+                # Crea un nombre de archivo único usando el ID y timestamp
+                nombre_base, extension = os.path.splitext(imagen.name)
+                nombre_seguro = f"{nombre_base}_{int(time.time())}{extension}"
                 
-                # Procesar la imagen para hacerla cuadrada
-                img = Image.open(imagen)
+                # Usa la carpeta media en lugar de static
+                ruta_relativa = os.path.join('img', 'estudiantes', nombre_seguro)
+                ruta_absoluta = os.path.join(settings.MEDIA_ROOT, 'img', 'estudiantes')
                 
-                # Determinar el tamaño del cuadrado
-                ancho, alto = img.size
-                tamaño = min(ancho, alto)
+                # Asegúrate de que la carpeta existe
+                os.makedirs(ruta_absoluta, exist_ok=True)
+                ruta_completa = os.path.join(ruta_absoluta, nombre_seguro)
                 
-                # Calcular coordenadas para recorte centrado
-                left = (ancho - tamaño) / 2
-                top = (alto - tamaño) / 2
-                right = (ancho + tamaño) / 2
-                bottom = (alto + tamaño) / 2
-                
-                # Recortar la imagen
-                img_recortada = img.crop((left, top, right, bottom))
-                
-                # Redimensionar a un tamaño estándar si lo deseas (opcional)
-                tamaño_final = 300  # Pixels
-                img_recortada = img_recortada.resize((tamaño_final, tamaño_final), Image.Resampling.LANCZOS)
-                
-                # Guardar en memoria
-                output = BytesIO()
-                
-                # Determinar el formato de salida
-                if img.format == 'JPEG' or img.format == 'JPG':
-                    img_recortada.save(output, format='JPEG', quality=85)
-                    extension = 'jpg'
-                else:
-                    img_recortada.save(output, format='PNG')
-                    extension = 'png'
-                    
-                output.seek(0)
-                
-                # Crear un nuevo archivo para Django
-                nueva_imagen = InMemoryUploadedFile(
-                    output,
-                    'ImageField',
-                    f"{imagen.name.split('.')[0]}_cuadrado.{extension}",
-                    'image/jpeg' if extension == 'jpg' else 'image/png',
-                    sys.getsizeof(output),
-                    None
-                )
-                
-                # Asignar la nueva imagen al estudiante
-                estudiante.imagen_perfil = nueva_imagen
-            
+                # Guarda la imagen
+                with open(ruta_completa, 'wb+') as destino:
+                    for chunk in imagen.chunks():
+                        destino.write(chunk)
+
+                # Guarda la ruta relativa en el campo
+                estudiante.urlImagenPerfil = os.path.join('media', ruta_relativa).replace('\\', '/')
+
             estudiante.save()
             messages.success(request, "Guardado Correctamente")
             return redirect('listaEstudiante')
@@ -249,6 +221,65 @@ def agregarEstudiante(request):
             data["form"] = formulario
             messages.warning(request, "Hubo un error")
     return render(request, 'agregar/estudiante.html', data)
+
+def modificarEstudiante(request, idEstudiante):
+    # Busca un elemento por su ID
+    estudiante = get_object_or_404(Estudiante, idEstudiante=idEstudiante)
+
+    data = {
+        'form': EstudianteForm(instance=estudiante),
+        'cancel_url': 'listaEstudiante',
+        'tabla': 'Estudiante'
+    }
+
+    if request.method == 'POST':
+        formulario = EstudianteForm(
+            data=request.POST, instance=estudiante, files=request.FILES)
+        if formulario.is_valid():
+            estudiante = formulario.save(commit=False)
+            
+            imagen = request.FILES.get('imagen')
+            if imagen:
+                # Guardar la ruta de la imagen antigua para eliminarla después
+                imagen_antigua = estudiante.urlImagenPerfil
+                ruta_antigua = None
+                if imagen_antigua:
+                    ruta_antigua = os.path.join(settings.MEDIA_ROOT, imagen_antigua.replace('media/', '', 1))
+                
+                # Crea un nombre de archivo único usando el ID y timestamp
+                nombre_base, extension = os.path.splitext(imagen.name)
+                nombre_seguro = f"{nombre_base}_{int(time.time())}{extension}"
+                
+                # Usa la carpeta media en lugar de static
+                ruta_relativa = os.path.join('img', 'estudiantes', nombre_seguro)
+                ruta_absoluta = os.path.join(settings.MEDIA_ROOT, 'img', 'estudiantes')
+                
+                # Asegúrate de que la carpeta existe
+                os.makedirs(ruta_absoluta, exist_ok=True)
+                ruta_completa = os.path.join(ruta_absoluta, nombre_seguro)
+                
+                # Guarda la imagen
+                with open(ruta_completa, 'wb+') as destino:
+                    for chunk in imagen.chunks():
+                        destino.write(chunk)
+
+                # Guarda la ruta relativa en el campo
+                estudiante.urlImagenPerfil = os.path.join('media', ruta_relativa).replace('\\', '/')
+                
+                # Eliminar la imagen antigua si existe
+                if ruta_antigua and os.path.isfile(ruta_antigua):
+                    try:
+                        os.remove(ruta_antigua)
+                    except (OSError, PermissionError):
+                        # Log el error pero continúa con la operación
+                        print(f"No se pudo eliminar la imagen anterior: {ruta_antigua}")
+            
+            estudiante.save()
+            messages.success(request, "Modificado Correctamente")
+            return redirect('listaEstudiante')
+
+        data["form"] = formulario
+    return render(request, 'modificar.html', data)
 
 def modificarEstudiante(request, idEstudiante):
     # Busca un elemento por su ID

@@ -111,6 +111,12 @@
     .current {
       z-index: 1;
     }
+
+    .titulo{
+      position: fixed;
+      top: 10%;
+      width: 90%;
+    }
   </style>
 </head>
 <body>
@@ -122,7 +128,7 @@
           <div class="page-content">
             <h1 class="mb-4">Observador Virtual</h1>
             {% if estudiante.imagen_perfil %}
-              <img src="{{ estudiante.imagen_perfil.url }}" alt="Foto de perfil de {{ estudiante.nombre }}" class="img-perfil" height="250px" style="border-radius: 100%;">
+              <img src="{{ estudiante.imagen_perfil.url }}" alt="Foto de perfil de {{ estudiante.nombre }}" class="img-perfil" height="250px" style="border-radius: 10%;">
             {% else %}
               <img src="{% static 'img/default-profile.png' %}" alt="Imagen por defecto" class="img-perfil" height="250px">
             {% endif %}
@@ -174,7 +180,9 @@
         <!-- Página 2 -->
         <div class="page" id="page2">
           <div class="page-content">
-            <h2>Anotaciones</h2>
+            <div class="titulo">
+              <h2>Anotaciones</h2>
+            
             <div class="table-responsive mt-4">
               <table class="table table-striped">
                   <tr>
@@ -186,6 +194,7 @@
                   </tr>
               </table>
             </div>
+          </div>
           </div>
           <div class="page-number">2</div>
         </div>
