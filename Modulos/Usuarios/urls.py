@@ -4,5 +4,6 @@ from django.contrib.auth.views import LogoutView
 from .views import *
 
 urlpatterns = [
-    path('observador/<idEstudiante>/', observadorEstudianteLibro, name="observador")
+    path('observador/<idEstudiante>/', observadorEstudianteLibro, name="observador"),
+    path('login/', login, name="login"),
 ]

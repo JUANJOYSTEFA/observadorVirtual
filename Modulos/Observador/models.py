@@ -36,7 +36,7 @@ class Estudiante(models.Model):
     documento = models.CharField(max_length=10, default=0)
     nombre = models.CharField(max_length=100)
     apellido = models.CharField(max_length=100)
-    edad = models.IntegerField()
+    fechaNacimiento = models.DateField(null=True)
     correo = models.EmailField(max_length=100)
     contrasena = models.CharField(max_length=100)
     faltasTipo1 = models.IntegerField(default=0)

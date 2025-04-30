@@ -9,10 +9,13 @@ def observadorEstudianteLibro(request, idEstudiante):
     acudiente = Acudiente.objects.filter(idEstudiante=idEstudiante).first()
 
     # Obtener todas las observaciones del estudiante
-    observaciones = Observacion.objects.filter(idEstudiante=idEstudiante)
+    observacion = Observacion.objects.filter(idEstudiante=idEstudiante)
 
     return render(request, 'observador/libro.html', {
         "estudiante": estudiante,
         "acudiente": acudiente,
-        "observaciones": observaciones
+        "observacion": observacion
     })
+
+def login(request):
+    return render(request, "iniciosesion.html")
