@@ -158,7 +158,7 @@
                   <p>{{estudiante.correo}}</p>
                 </div>
               </div>
-              {{if acudiente}}
+              {%if acudiente%}
               <div class="col-md-6">
                 <div class="mb-3">
                   <strong>Nombre del Acudiente:</strong>
@@ -174,7 +174,7 @@
                 </div>
               </div>
             </div>
-            {{endif}}
+            {%endif%}
           </div>
           <div class="page-number">1</div>
         </div>
@@ -184,7 +184,7 @@
           <div class="page-content">
             <div class="titulo">
               <h2>Anotaciones</h2>
-            {{if observacion}}
+            {%if observacion%}
             <div class="table-responsive mt-4">
               <table class="table table-striped">
                   <tr>
@@ -196,7 +196,7 @@
                   </tr>
               </table>
             </div>
-            {{endif}}
+            {%endif%}
            </div>
           </div>
           <div class="page-number">2</div>
