@@ -1,0 +1,179 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Interfaz de Carpetas</title>
+        <link rel="stylesheet" href="{% static 'css/stylesCarpetas.css' %}">
+    </head>
+
+    <body>
+        <div class="container">
+            <div class="header">
+                <div class="menu-icon" id="menu-toggle">
+                    <div class="menu-line"></div>
+                    <div class="menu-line"></div>
+                    <div class="menu-line"></div>
+                </div>
+                <div class="title">[Salon1]</div>
+                <div class="profile-icon"></div>
+            </div>
+
+            <div class="sidebar" id="sidebar">
+                <div class="sidebar-header">
+                    <div class="sidebar-icon"></div>
+                    <div class="sidebar-title">Ordenar</div>
+                </div>
+                <div class="sidebar-item">
+                    <div class="sidebar-item-icon">+</div>
+                    <div class="sidebar-item-text">Nuevo</div>
+                </div>
+                <div class="sidebar-item">
+                    <div class="sidebar-item-icon">✓</div>
+                    <div class="sidebar-item-text">Por nombre (a-z)</div>
+                </div>
+                <div class="sidebar-item">
+                    <div class="sidebar-item-icon">✓</div>
+                    <div class="sidebar-item-text">Por modificación</div>
+                </div>
+            </div>
+
+            <div class="search-bar">
+                <input type="text" class="search-input" placeholder="Buscar su carpeta aquí...">
+                <div class="search-button">
+                    <span class="search-icon">⌕</span>
+                </div>
+            </div>
+
+            <div class="content">
+                <div class="folder" data-image="/api/placeholder/160/120" data-title="Salón 1"
+                    data-desc="Material de clase y recursos">
+                    <div class="folder-tooltip">
+                        <img class="tooltip-image" src="/api/placeholder/160/120" alt="Imagen personalizable">
+                        <div class="tooltip-title">Salón 1</div>
+                        <div class="tooltip-desc">Material de clase y recursos</div>
+                    </div>
+                    <div class="folder-label">[Salon1]</div>
+                </div>
+                <div class="folder" data-image="/api/placeholder/160/120" data-title="Estudiante 2"
+                    data-desc="Trabajos y evaluaciones">
+                    <div class="folder-tooltip">
+                        <img class="tooltip-image" src="/api/placeholder/160/120" alt="Imagen personalizable">
+                        <div class="tooltip-title">Estudiante 2</div>
+                        <div class="tooltip-desc">Trabajos y evaluaciones</div>
+                    </div>
+                    <div class="folder-label">[Estudiante2]</div>
+                </div>
+            </div>
+        </div>
+
+        <script>
+            document.getElementById('menu-toggle').addEventListener('click', function () {
+                document.getElementById('sidebar').classList.toggle('active');
+            });
+
+            // Función para configurar imágenes personalizadas
+            function setCustomImages() {
+                const folders = document.querySelectorAll('.folder');
+
+                folders.forEach(folder => {
+                    // Obtener los atributos de datos
+                    const imageUrl = folder.getAttribute('data-image');
+                    const title = folder.getAttribute('data-title');
+                    const desc = folder.getAttribute('data-desc');
+
+                    const tooltipImage = folder.querySelector('.tooltip-image');
+                    const tooltipTitle = folder.querySelector('.tooltip-title');
+                    const tooltipDesc = folder.querySelector('.tooltip-desc');
+
+                    // Asignar la imagen y texto
+                    if (tooltipImage) tooltipImage.src = imageUrl;
+                    if (tooltipTitle) tooltipTitle.textContent = title;
+                    if (tooltipDesc) tooltipDesc.textContent = desc;
+                });
+            }
+
+            // Función para permitir al usuario cambiar la imagen
+            function setupImageCustomization() {
+                const folders = document.querySelectorAll('.folder');
+
+                folders.forEach(folder => {
+                    folder.addEventListener('dblclick', function () {
+                        const imageUrl = prompt('Ingresa la URL de la imagen:', folder.getAttribute('data-image'));
+                        const title = prompt('Ingresa el título:', folder.getAttribute('data-title'));
+                        const desc = prompt('Ingresa la descripción:', folder.getAttribute('data-desc'));
+
+                        if (imageUrl) {
+                            folder.setAttribute('data-image', imageUrl);
+                            const tooltipImage = folder.querySelector('.tooltip-image');
+                            if (tooltipImage) tooltipImage.src = imageUrl;
+                        }
+
+                        if (title) {
+                            folder.setAttribute('data-title', title);
+                            const tooltipTitle = folder.querySelector('.tooltip-title');
+                            if (tooltipTitle) tooltipTitle.textContent = title;
+                        }
+
+                        if (desc) {
+                            folder.setAttribute('data-desc', desc);
+                            const tooltipDesc = folder.querySelector('.tooltip-desc');
+                            if (tooltipDesc) tooltipDesc.textContent = desc;
+                        }
+
+                        // Guardar en localStorage para persistencia
+                        saveCustomizations();
+                    });
+                });
+            }
+
+            // Guardar personalizaciones
+            function saveCustomizations() {
+                const folders = document.querySelectorAll('.folder');
+                const customizations = [];
+
+                folders.forEach((folder, index) => {
+                    customizations.push({
+                        index: index,
+                        image: folder.getAttribute('data-image'),
+                        title: folder.getAttribute('data-title'),
+                        desc: folder.getAttribute('data-desc')
+                    });
+                });
+
+                localStorage.setItem('folderCustomizations', JSON.stringify(customizations));
+            }
+
+            // Cargar personalizaciones guardadas
+            function loadCustomizations() {
+                const saved = localStorage.getItem('folderCustomizations');
+                if (saved) {
+                    const customizations = JSON.parse(saved);
+                    const folders = document.querySelectorAll('.folder');
+
+                    customizations.forEach(item => {
+                        if (folders[item.index]) {
+                            const folder = folders[item.index];
+                            folder.setAttribute('data-image', item.image);
+                            folder.setAttribute('data-title', item.title);
+                            folder.setAttribute('data-desc', item.desc);
+                        }
+                    });
+
+                    setCustomImages();
+                }
+            }
+
+            // Inicializar
+            window.addEventListener('DOMContentLoaded', function () {
+                loadCustomizations();
+                setCustomImages();
+                setupImageCustomization();
+            });
+        </script>
+    </body>
+
+</html>
+

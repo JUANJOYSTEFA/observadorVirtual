@@ -17,7 +17,6 @@ import os
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 
-
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
 
@@ -29,6 +28,13 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
+
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'  # O tu proveedor de correo
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = 'techbrothers6236@gmail.com'
+EMAIL_HOST_PASSWORD = 'mozp ihcn fkag nuhr'
 
 # Application definition
 
@@ -84,10 +90,10 @@ CRISPY_TEMPLATE_PACK = 'bootstrap5'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'observador.sqlite3',  # Asegúrate de que la ruta sea correcta
+        # Asegúrate de que la ruta sea correcta
+        'NAME': BASE_DIR / 'observador.sqlite3',
     }
 }
-
 
 
 # Password validation
@@ -142,3 +148,4 @@ MEDIA_URL = '/media/'
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+MESSAGES_STORAGE = 'django.contrib.messages.storage.session.SessionStorage'

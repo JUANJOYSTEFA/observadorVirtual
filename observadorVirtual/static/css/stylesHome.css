@@ -1,0 +1,203 @@
+/* Scrollbar */
+body::-webkit-scrollbar{
+    width: 0.25rem;
+}
+
+body::-webkit-scrollbar-track{
+    background: #1e1e24;
+}
+
+body::-webkit-scrollbar-thumb{
+    background: #2f131e;
+}
+
+/* Asegura que el logo se mantenga centrado */
+.navbar-center {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  transition: transform 0.5s ease;
+  z-index: 1;
+}
+
+/* Desplaza el logo cuando la caja de búsqueda se expande */
+.box:hover ~ .navbar-center,
+.transition-box:hover ~ .navbar-center {
+  transform: translateX(-60%); /* Ajusta el valor según cómo quieras moverlo */
+}
+
+/* Ajustes para el contenedor de búsqueda */
+.box {
+  height: 30px;
+  display: flex;
+  cursor: pointer;
+  padding: 10px 20px;
+  background: #ffffff;
+  border-radius: 30px;
+  align-items: center;
+  box-shadow: 0 10px 25px #ffecc9;
+  transition: all 0.8s ease;
+  position: relative;
+}
+
+.box input {
+  width: 0;
+  outline: none;
+  border: none;
+  font-weight: 500;
+  transition: 0.8s;
+  background: transparent;
+}
+
+.box:hover input {
+  width: 400px; /* Menor que 400px para no afectar tanto el logo */
+}
+
+
+/* button color */
+
+  .btn-color {
+    background-color: #2f131e;  
+    color: white;
+  }
+
+  .btn-color:hover {
+    background-color: #421628; 
+    color: white;
+}
+
+.btn-outline {
+    background-color: white;  
+    color: white;
+  }
+
+  .btn-outline:hover {
+    background-color: #421628; 
+    color: white;
+}
+
+/* Carrusel ocupa toda la pantalla */
+#carouselExampleAutoplaying {
+    position: relative;
+    height: 100vh;
+    overflow: hidden;
+  }
+  
+  .carousel-item img {
+    height: 100vh;
+    object-fit: cover;
+    opacity: 1;
+    transition: transform 2s ease-in-out;
+  }
+  
+  /* Gradiente encima del carrusel */
+  .carousel-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(to bottom, rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6));
+    z-index: 2;
+  }
+  
+  /* Texto sobre todo */
+  .overlay-text {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 3;
+    text-align: center;
+    color: white;
+    padding: 1rem;
+  }
+  
+  .overlay-text h1 {
+    font-size: clamp(2.5rem, 6vw, 5rem);
+    font-weight: bold;
+    text-shadow: 3px 3px 10px rgba(0, 0, 0, 0.7);
+  }
+  
+  .overlay-text p {
+    font-size: clamp(1rem, 2vw, 2rem);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.6);
+  }
+  
+  .btn-color {
+    background-color: #2f131e;
+    border: none;
+    color: white;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+  }
+  
+  .btn-color:hover {
+    background-color: #421628;
+    transform: scale(1.05);
+  }
+  
+  .carousel-control-prev,
+  .carousel-control-next {
+    display: none;
+  }
+  
+  @media (max-width: 576px) {
+    .overlay-text {
+      padding: 2rem 1rem;
+    }
+  }
+
+  /* Estilos para los dropdowns y el hover */
+.nav-item .nav-link {
+  transition: all 0.3s ease;
+}
+
+/* Cambiar color de fondo al hacer hover sobre un item */
+.nav-item .nav-link:hover {
+  background-color: #ebc7d6; /* Cambia el color a tu preferencia */
+  color: #523a44; /* Cambia el color del texto cuando se hace hover */
+}
+
+/* Estilo para los dropdowns */
+.nav-item.dropdown .nav-link {
+  font-weight: bold;
+}
+
+.nav-item .nav-link:focus {
+  outline: none;
+}
+
+/* Estilos para los submenús */
+.collapse {
+  background-color: #f8f9fa; /* Color de fondo para los submenús */
+  padding-left: 20px; /* Espaciado de los submenús */
+}
+
+.collapse .nav-link {
+  color: #555; /* Color de texto para los submenús */
+}
+
+.collapse .nav-link:hover {
+  background-color: #f7dce7;
+  color: #421628;
+}
+
+/* Cambiar color de iconos de la navbar */
+.navbar .btn-outline-dark i {
+  color: #421628;
+}
+
+.navbar .btn-outline-dark:hover i {
+  color: #ffffff; /* Color de los iconos al pasar el mouse */
+}
+
+.nav-item .nav-link {
+  color: rgb(34, 33, 33); /* Color del texto */
+  background-color: #ffffff; /* Fondo del dropdown */
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+.ciclos{
+  color: #200711;
+}

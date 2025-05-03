@@ -7,6 +7,7 @@ from django.db.models import Q
 from django.contrib import messages
 from django.conf import settings
 from django.core.files.storage import default_storage
+from django.contrib.auth.hashers import make_password, is_password_usable
 from .models import *
 from .forms import *
 import logging
@@ -191,28 +192,35 @@ def agregarEstudiante(request):
         formulario = EstudianteForm(data=request.POST, files=request.FILES)
         if formulario.is_valid():
             estudiante = formulario.save(commit=False)
-            
+
+            # Hashear la contraseña antes de guardar
+            if hasattr(estudiante, 'contrasena') and estudiante.contrasena:
+                estudiante.contrasena = make_password(estudiante.contrasena)
+
             imagen = request.FILES.get('imagen')
             if imagen:
                 # Crea un nombre de archivo único usando el ID y timestamp
                 nombre_base, extension = os.path.splitext(imagen.name)
                 nombre_seguro = f"{nombre_base}_{int(time.time())}{extension}"
-                
+
                 # Usa la carpeta media en lugar de static
-                ruta_relativa = os.path.join('img', 'estudiantes', nombre_seguro)
-                ruta_absoluta = os.path.join(settings.MEDIA_ROOT, 'img', 'estudiantes')
-                
+                ruta_relativa = os.path.join(
+                    'img', 'estudiantes', nombre_seguro)
+                ruta_absoluta = os.path.join(
+                    settings.MEDIA_ROOT, 'img', 'estudiantes')
+
                 # Asegúrate de que la carpeta existe
                 os.makedirs(ruta_absoluta, exist_ok=True)
                 ruta_completa = os.path.join(ruta_absoluta, nombre_seguro)
-                
+
                 # Guarda la imagen
                 with open(ruta_completa, 'wb+') as destino:
                     for chunk in imagen.chunks():
                         destino.write(chunk)
 
                 # Guarda la ruta relativa en el campo
-                estudiante.urlImagenPerfil = os.path.join('media', ruta_relativa).replace('\\', '/')
+                estudiante.urlImagenPerfil = os.path.join(
+                    'media', ruta_relativa).replace('\\', '/')
 
             estudiante.save()
             messages.success(request, "Guardado Correctamente")
@@ -222,9 +230,12 @@ def agregarEstudiante(request):
             messages.warning(request, "Hubo un error")
     return render(request, 'agregar/estudiante.html', data)
 
+
 def modificarEstudiante(request, idEstudiante):
     # Busca un elemento por su ID
     estudiante = get_object_or_404(Estudiante, idEstudiante=idEstudiante)
+    contrasena_original = estudiante.contrasena if hasattr(
+        estudiante, 'contrasena') else None
 
     data = {
         'form': EstudianteForm(instance=estudiante),
@@ -237,140 +248,57 @@ def modificarEstudiante(request, idEstudiante):
             data=request.POST, instance=estudiante, files=request.FILES)
         if formulario.is_valid():
             estudiante = formulario.save(commit=False)
-            
+
+            # Verificar si la contraseña ha cambiado
+            if hasattr(estudiante, 'contrasena') and estudiante.contrasena:
+
+                # Si la contraseña es nueva o ha cambiado, aplicar hash
+                if not contrasena_original or estudiante.contrasena != contrasena_original:
+                    # Si la contraseña actual no parece un hash, aplicar hash
+                    if not is_password_usable(estudiante.contrasena):
+                        estudiante.contrasena = make_password(
+                            estudiante.contrasena)
+
             imagen = request.FILES.get('imagen')
             if imagen:
-                # Guardar la ruta de la imagen antigua para eliminarla después
+                # Código para manejar la imagen (sin cambios)...
                 imagen_antigua = estudiante.urlImagenPerfil
                 ruta_antigua = None
                 if imagen_antigua:
-                    ruta_antigua = os.path.join(settings.MEDIA_ROOT, imagen_antigua.replace('media/', '', 1))
-                
-                # Crea un nombre de archivo único usando el ID y timestamp
+                    ruta_antigua = os.path.join(
+                        settings.MEDIA_ROOT, imagen_antigua.replace('media/', '', 1))
+
                 nombre_base, extension = os.path.splitext(imagen.name)
                 nombre_seguro = f"{nombre_base}_{int(time.time())}{extension}"
-                
-                # Usa la carpeta media en lugar de static
-                ruta_relativa = os.path.join('img', 'estudiantes', nombre_seguro)
-                ruta_absoluta = os.path.join(settings.MEDIA_ROOT, 'img', 'estudiantes')
-                
-                # Asegúrate de que la carpeta existe
+
+                ruta_relativa = os.path.join(
+                    'img', 'estudiantes', nombre_seguro)
+                ruta_absoluta = os.path.join(
+                    settings.MEDIA_ROOT, 'img', 'estudiantes')
+
                 os.makedirs(ruta_absoluta, exist_ok=True)
                 ruta_completa = os.path.join(ruta_absoluta, nombre_seguro)
-                
-                # Guarda la imagen
+
                 with open(ruta_completa, 'wb+') as destino:
                     for chunk in imagen.chunks():
                         destino.write(chunk)
 
-                # Guarda la ruta relativa en el campo
-                estudiante.urlImagenPerfil = os.path.join('media', ruta_relativa).replace('\\', '/')
-                
-                # Eliminar la imagen antigua si existe
+                estudiante.urlImagenPerfil = os.path.join(
+                    'media', ruta_relativa).replace('\\', '/')
+
                 if ruta_antigua and os.path.isfile(ruta_antigua):
                     try:
                         os.remove(ruta_antigua)
                     except (OSError, PermissionError):
-                        # Log el error pero continúa con la operación
-                        print(f"No se pudo eliminar la imagen anterior: {ruta_antigua}")
-            
+                        print(
+                            f"No se pudo eliminar la imagen anterior: {ruta_antigua}")
+
             estudiante.save()
             messages.success(request, "Modificado Correctamente")
             return redirect('listaEstudiante')
 
         data["form"] = formulario
     return render(request, 'modificar.html', data)
-
-def modificarEstudiante(request, idEstudiante):
-    # Busca un elemento por su ID
-    estudiante = get_object_or_404(Estudiante, idEstudiante=idEstudiante)
-
-    data = {
-        'form': EstudianteForm(instance=estudiante),
-        'cancel_url': 'listaEstudiante',
-        'tabla': 'Estudiante'
-    }
-
-    if request.method == 'POST':
-        formulario = EstudianteForm(
-            data=request.POST, instance=estudiante, files=request.FILES)
-        if formulario.is_valid():
-            estudiante = formulario.save(commit=False)
-            
-            # Verificar si se subió una nueva imagen
-            if 'imagen' in request.FILES:
-                imagen = request.FILES['imagen']
-                
-                # Procesar la imagen para hacerla cuadrada
-                img = Image.open(imagen)
-                
-                # Determinar el tamaño del cuadrado
-                ancho, alto = img.size
-                tamaño = min(ancho, alto)
-                
-                # Calcular coordenadas para recorte centrado
-                left = (ancho - tamaño) / 2
-                top = (alto - tamaño) / 2
-                right = (ancho + tamaño) / 2
-                bottom = (alto + tamaño) / 2
-                
-                # Recortar la imagen
-                img_recortada = img.crop((left, top, right, bottom))
-                
-                # Redimensionar a un tamaño estándar
-                tamaño_final = 300  # Pixels
-                img_recortada = img_recortada.resize((tamaño_final, tamaño_final), Image.Resampling.LANCZOS)
-                
-                # Guardar en memoria
-                output = BytesIO()
-                
-                # Determinar el formato de salida
-                if img.format == 'JPEG' or img.format == 'JPG':
-                    img_recortada.save(output, format='JPEG', quality=85)
-                    extension = 'jpg'
-                else:
-                    img_recortada.save(output, format='PNG')
-                    extension = 'png'
-                    
-                output.seek(0)
-                
-                # Crear un nuevo archivo para Django
-                nueva_imagen = InMemoryUploadedFile(
-                    output,
-                    'ImageField',
-                    f"{imagen.name.split('.')[0]}_cuadrado.{extension}",
-                    'image/jpeg' if extension == 'jpg' else 'image/png',
-                    sys.getsizeof(output),
-                    None
-                )
-                
-                # Si había una imagen anterior, eliminarla
-                if estudiante.imagen_perfil:
-                    try:
-                        # Guardar la ruta del archivo anterior
-                        old_image_path = estudiante.imagen_perfil.path
-                        
-                        # Asignar la nueva imagen
-                        estudiante.imagen_perfil = nueva_imagen
-                        
-                        # Si la asignación fue exitosa, eliminar el archivo antiguo
-                        import os
-                        if os.path.isfile(old_image_path):
-                            os.remove(old_image_path)
-                    except:
-                        # Si hay algún error, simplemente asignar la nueva imagen sin eliminar la antigua
-                        estudiante.imagen_perfil = nueva_imagen
-                else:
-                    # Si no había imagen anterior, simplemente asignar la nueva
-                    estudiante.imagen_perfil = nueva_imagen
-            
-            estudiante.save()
-            messages.success(request, "Modificado Correctamente")
-            return redirect('listaEstudiante')
-
-        data["form"] = formulario
-    return render(request, 'modificar.html', data)
-
 
 def eliminarEstudiante(request, idEstudiante):
     estudiante = get_object_or_404(Estudiante, idEstudiante=idEstudiante)
@@ -407,7 +335,13 @@ def agregarAcudiente(request):
     if request.method == 'POST':
         formulario = AcudienteForm(data=request.POST, files=request.FILES)
         if formulario.is_valid():
-            formulario.save()
+            acudiente = formulario.save(commit=False)
+
+            # Aplicar hash a la contraseña antes de guardar
+            if hasattr(acudiente, 'contrasena') and acudiente.contrasena:
+                acudiente.contrasena = make_password(acudiente.contrasena)
+
+            acudiente.save()
             messages.success(request, "Guardado Correctamente")
             return redirect('listaAcudiente')
         else:
@@ -420,6 +354,7 @@ def agregarAcudiente(request):
 def modificarAcudiente(request, idAcudiente):
     # Busca un elemento por su ID
     acudiente = get_object_or_404(Acudiente, idAcudiente=idAcudiente)
+    contrasena_original = acudiente.contrasena if hasattr(acudiente, 'contrasena') else None
 
     data = {
         'form': AcudienteForm(instance=acudiente),
@@ -431,7 +366,17 @@ def modificarAcudiente(request, idAcudiente):
         formulario = AcudienteForm(
             data=request.POST, instance=acudiente, files=request.FILES)
         if formulario.is_valid():
-            formulario.save()
+            acudiente = formulario.save(commit=False)
+            
+            # Verificar si la contraseña ha cambiado
+            if hasattr(acudiente, 'contrasena') and acudiente.contrasena:
+                # Si la contraseña es nueva o ha cambiado, aplicar hash
+                if not contrasena_original or acudiente.contrasena != contrasena_original:
+                    # Si la contraseña actual no parece un hash, aplicar hash
+                    if not is_password_usable(acudiente.contrasena):
+                        acudiente.contrasena = make_password(acudiente.contrasena)
+            
+            acudiente.save()
             messages.success(request, "Modificado Correctamente")
             return redirect('listaAcudiente')
 
@@ -471,7 +416,13 @@ def agregarAdministrativo(request):
         formulario = AdministrativosForm(
             data=request.POST, files=request.FILES)
         if formulario.is_valid():
-            formulario.save()
+            administrativo = formulario.save(commit=False)
+            
+            # Aplicar hash a la contraseña antes de guardar
+            if hasattr(administrativo, 'contrasena') and administrativo.contrasena:
+                administrativo.contrasena = make_password(administrativo.contrasena)
+                
+            administrativo.save()
             messages.success(request, "Guardado Correctamente")
             return redirect('listaAdministrativo')
         else:
@@ -483,20 +434,33 @@ def agregarAdministrativo(request):
 
 def modificarAdministrativo(request, idAdministrativo):
     # Busca un elemento por su ID
-    administrativos = get_object_or_404(
+    administrativo = get_object_or_404(
         Administrativos, idAdministrativo=idAdministrativo)
+    contrasena_original = administrativo.contrasena if hasattr(
+        administrativo, 'contrasena') else None
 
     data = {
-        'form': AdministrativosForm(instance=administrativos),
+        'form': AdministrativosForm(instance=administrativo),
         'cancel_url': 'listaAdministrativo',
         'tabla': 'Administrativo'
     }
 
     if request.method == 'POST':
         formulario = AdministrativosForm(
-            data=request.POST, instance=administrativos, files=request.FILES)
+            data=request.POST, instance=administrativo, files=request.FILES)
         if formulario.is_valid():
-            formulario.save()
+            administrativo = formulario.save(commit=False)
+
+            # Verificar si la contraseña ha cambiado
+            if hasattr(administrativo, 'contrasena') and administrativo.contrasena:
+                # Si la contraseña es nueva o ha cambiado, aplicar hash
+                if not contrasena_original or administrativo.contrasena != contrasena_original:
+                    # Si la contraseña actual no parece un hash, aplicar hash
+                    if not is_password_usable(administrativo.contrasena):
+                        administrativo.contrasena = make_password(
+                            administrativo.contrasena)
+
+            administrativo.save()
             messages.success(request, "Modificado Correctamente")
             return redirect('listaAdministrativo')
 

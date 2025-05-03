@@ -1,0 +1,58 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+        <link rel="stylesheet" href="{% static 'css/stylesLogin.css' %}">
+        <link rel="shortcut icon" href="{% static 'img/favicon.ico' %}" type="image/x-icon">
+        <title>Inicia Sesión</title>
+    </head>
+
+    <body>
+        <div class="container" id="container">
+            <div class="form-container sign-in">
+                <form method="POST" action="{% url 'login' %}">
+                    {% csrf_token %}
+                    <h1>Iniciar Sesión</h1>
+                    <br>
+                    {% if messages %}
+                    <div class="error-message">
+                        {% for message in messages %}
+                        {{ message }}
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+                    <input type="email" name="email" placeholder="Email" class="form-control form-control-lg" required>
+                    <div class="password-container">
+                        <input type="password" id="password" name="password" placeholder="Password" required>
+                        <i class="toggle-password fa-solid fa-eye-slash" id="togglePassword"></i>
+                    </div>
+                    <a href="{% url 'password_reset' %}">¿Olvidaste tu contaseña?</a>
+                    <button type="submit">Continuar</button>
+                </form>
+            </div>
+        </div>
+
+        <script>
+            // Script para mostrar/ocultar la contraseña
+            document.addEventListener('DOMContentLoaded', function () {
+                const togglePassword = document.getElementById('togglePassword');
+                const password = document.getElementById('password');
+
+                togglePassword.addEventListener('click', function () {
+                    // Cambiar el tipo de input entre "password" y "text"
+                    const type = password.getAttribute('type') === 'password' ? 'text' : 'password';
+                    password.setAttribute('type', type);
+
+                    // Cambiar el icono entre ojo y ojo tachado
+                    this.classList.toggle('fa-eye');
+                    this.classList.toggle('fa-eye-slash');
+                });
+            });
+        </script>
+    </body>
+
+</html>

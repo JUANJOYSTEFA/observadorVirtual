@@ -25,7 +25,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('logout/', LogoutView.as_view(next_page='login'), name='logout'),
     path('crud/', include("Modulos.Observador.urls"), name="crud"),
-    path('', include("Modulos.Usuarios.urls"), name="principal"),
+    path('', include("Modulos.Usuarios.urls"), name="usuarios")
 ]
 
 if settings.DEBUG:
