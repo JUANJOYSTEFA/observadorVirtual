@@ -1,0 +1,11 @@
+2025-05-03 16:43:15,343 - INFO - Iniciando migración de contraseñas para modelo: Estudiante
+2025-05-03 16:43:15,449 - INFO - Contraseña migrada exitosamente para: danielalejandroguerrero41@gmail.com
+2025-05-03 16:43:15,509 - INFO - Contraseña migrada exitosamente para: saray.n.santos.m@gmail.com
+2025-05-03 16:43:15,566 - INFO - Contraseña migrada exitosamente para: juanjoseromerogomez0@gmail.com
+2025-05-03 16:43:15,621 - INFO - Contraseña migrada exitosamente para: juanjose1rg@hotmail.com
+2025-05-03 16:43:15,623 - INFO - Iniciando migración de contraseñas para modelo: Acudiente
+2025-05-03 16:43:15,681 - INFO - Contraseña migrada exitosamente para: marisol@gmail.com
+2025-05-03 16:43:15,684 - INFO - Iniciando migración de contraseñas para modelo: Administrativos
+2025-05-03 16:43:15,739 - INFO - Contraseña migrada exitosamente para: jcjaramillo@cosfacali.edu.co
+2025-05-03 16:43:15,798 - INFO - Contraseña migrada exitosamente para: jcgalindo@cosfacali.edu.co
+2025-05-03 16:43:15,799 - INFO - Migración completa. Total: 7 contraseñas

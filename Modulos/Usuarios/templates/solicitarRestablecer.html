@@ -1,0 +1,24 @@
+{% extends 'baseLogin.html' %}
+
+{% block tittle %}Restablecer Contraseña{% endblock %}
+
+{% block content%}
+
+<form method="POST" action="{% url 'solicitarRestablecer' %}">
+    {% csrf_token %}
+    <h1>Restablecer Contraseña</h1>
+    <br>
+    {% if messages %}
+    <div class="alert alert-danger" role="alert">
+        {% for message in messages %}
+        {{ message }}
+        {% endfor %}
+    </div>
+    {% endif %}
+    <p>Ingresa tu correo electrónico y te enviaremos instrucciones para restablecer tu contraseña.</p>
+    <input type="email" name="email" placeholder="Email" class="form-control form-control-lg" required>
+    <button type="submit">Enviar Instrucciones</button>
+    <a href="{% url 'login' %}">Volver al inicio de sesión</a>
+</form>
+
+{% endblock %}

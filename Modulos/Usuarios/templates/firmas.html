@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Firma Digital</title>
+    <script src="https://cdn.jsdelivr.net/npm/signature_pad"></script>
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; }
+        canvas { border: 2px solid #000; display: block; margin: 10px auto; }
+        button { margin: 5px; padding: 10px; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <h2>Firma Digital</h2>
+    <canvas id="firmaCanvas" width="800" height="400"></canvas>
+    <br>
+    <button id="clear">Limpiar</button>
+    <button id="save">Descargar</button>
+    
+    <script>
+        const canvas = document.getElementById("firmaCanvas");
+        const signaturePad = new SignaturePad(canvas);
+        
+        document.getElementById("clear").addEventListener("click", function () {
+            signaturePad.clear();
+        });
+        
+        document.getElementById("save").addEventListener("click", function () {
+            if (!signaturePad.isEmpty()) {
+                const dataURL = signaturePad.toDataURL("image/png");
+                const link = document.createElement("a");
+                link.href = dataURL;
+                link.download = "firma.png";
+                link.click();
+            } else {
+                alert("Por favor, firma antes de descargar.");
+            }
+        });
+    </script>
+</body>
+</html>

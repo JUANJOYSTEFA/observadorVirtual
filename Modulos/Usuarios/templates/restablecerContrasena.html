@@ -1,0 +1,31 @@
+{% extends 'baseLogin.html' %}
+
+{% block tittle %}Nueva Contraseña{% endblock %}
+
+{% block content%}
+
+<form method="POST">
+    {% csrf_token %}
+    <h1>Nueva Contraseña</h1>
+    <br>
+    {% if messages %}
+    <div class="alert alert-danger" role="alert">
+        {% for message in messages %}
+        {{ message }}
+        {% endfor %}
+    </div>
+    {% endif %}
+    <p>Ingresa tu nueva contraseña para tu cuenta.</p>
+    <div class="password-container">
+        <input type="password" id="password" name="password" placeholder="Nueva contraseña" required>
+        <i class="toggle-password fa-solid fa-eye-slash" id="togglePassword"></i>
+    </div>
+    <div class="password-container">
+        <input type="password" id="confirm_password" name="confirm_password" placeholder="Confirmar contraseña"
+            required>
+        <i class="toggle-password fa-solid fa-eye-slash" id="toggleConfirmPassword"></i>
+    </div>
+    <button type="submit">Cambiar Contraseña</button>
+</form>
+
+{% endblock %}

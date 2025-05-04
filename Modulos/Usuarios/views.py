@@ -1,6 +1,13 @@
+import secrets
+from django.urls import reverse
+from django.shortcuts import render, redirect
+from django.core.mail import send_mail
+from datetime import datetime, timedelta
 from django.shortcuts import render
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
+from django.contrib.auth.hashers import make_password, check_password
+from django.contrib.auth.decorators import login_required
 from Modulos.Observador.models import *
 # Create your views here.
 
@@ -31,16 +38,19 @@ def salones(request):
 def home(request):
     """Vista de la página de inicio"""
 
-    # Si el usuario ha iniciado sesión, agregamos información al contexto
+    # Inicializa el contexto
     context = {}
+    isLoggedIn = request.session.get('isLogged', False)
 
-    if 'user_id' in request.session:
-        context['user_logged_in'] = True
-        context['user_type'] = request.session.get('user_type')
-        context['user_nombre'] = request.session.get('user_nombre')
+    if isLoggedIn:
+        context['userLogged'] = True
+        # Asegúrate de que la clave sea correcta
+        context['userType'] = request.session.get('userType')
+        context['userNombre'] = request.session.get('userNombre')  # Asegúrate de que la clave sea correcta
 
-        user_type = request.session.get('user_type')
-        user_id = request.session.get('user_id')
+        user_type = context['userType']
+        # Asegúrate de que la clave sea correcta
+        user_id = request.session.get('userId')
 
         if user_type == 'estudiante':
             try:
@@ -53,7 +63,7 @@ def home(request):
             try:
                 acudiente = Acudiente.objects.get(idAcudiente=user_id)
                 context['acudiente'] = acudiente
-                context['estudiante_relacionado'] = acudiente.idEstudiante
+                context['estudianteRelacionado'] = acudiente.idEstudiante
             except Acudiente.DoesNotExist:
                 pass
 
@@ -66,9 +76,11 @@ def home(request):
             except Administrativos.DoesNotExist:
                 pass
 
-    # Aquí continúa tu lógica existente para la vista home
-
-    return render(request, 'home.html', context)
+        # Renderiza la página de bienvenida con el contexto
+        return render(request, 'home.html', context)
+    else:
+        # Si el usuario no está autenticado, renderiza la página de inicio
+        return render(request, 'home.html')
 
 
 def iniciar_sesion(request):
@@ -78,7 +90,6 @@ def iniciar_sesion(request):
         password = request.POST.get('password')
 
         # Lista de modelos y sus configuraciones para intentar la autenticación
-        # Cada tupla contiene: (modelo, tipo_usuario, campo_id)
         modelos_autenticacion = [
             (Estudiante, 'estudiante', 'idEstudiante'),
             (Acudiente, 'acudiente', 'idAcudiente'),
@@ -91,30 +102,26 @@ def iniciar_sesion(request):
                 user = model.objects.get(correo=email)
 
                 # Verificar la contraseña
-                if user.contrasena == password:  # Comparación directa, ajustar si usas hash
+                if check_password(password, user.contrasena):
                     # Contraseña correcta, almacenar información en la sesión
-                    request.session['user_id'] = getattr(user, id_field)
-                    request.session['user_type'] = user_type
-                    request.session['user_email'] = user.correo
-                    request.session['user_nombre'] = f"{user.nombre} {user.apellido}"
+                    request.session['isLogged'] = True
+                    request.session['userId'] = getattr(user, id_field)
+                    request.session['userType'] = user_type
+                    request.session['userEmail'] = user.correo
+                    request.session['userNombre'] = f"{user.nombre} {user.apellido}"
 
                     # Si es administrativo, guardar el cargo
                     if user_type == 'administrativo':
-                        request.session['user_cargo'] = user.cargo
+                        request.session['userType'] = user.cargo
 
                     # Redirigir a la página de inicio
                     return redirect('home')
-
-                # Si encontramos el usuario pero la contraseña es incorrecta
-                # No seguimos buscando en otros modelos
-                messages.error(request, 'Correo o contraseña incorrectos')
-                return render(request, 'iniciarsesion.html')
 
             except model.DoesNotExist:
                 # Usuario no encontrado en este modelo, continuamos con el siguiente
                 continue
 
-        # Si llegamos aquí, el usuario no se encontró en ningún modelo
+        # Si llegamos aquí, el usuario no se encontró en ningún modelo o la contraseña fue incorrecta
         messages.error(request, 'Correo o contraseña incorrectos')
         return render(request, 'iniciarsesion.html')
 
@@ -128,6 +135,141 @@ def cerrar_sesion(request):
     request.session.flush()
     return redirect('login')
 
-# Modifica tu vista home existente para usar la información de sesión
-# Si ya tienes una vista home, puedes adaptarla para que verifique la sesión
+# En el archivo views.py
 
+
+# Ejemplo con diferentes tipos de mensajes:
+
+
+def solicitarRestablecer(request):
+    """Vista para solicitar el restablecimiento de contraseña"""
+    if request.method == 'POST':
+        email = request.POST.get('email')
+
+        # Lista de modelos para buscar el correo
+        modelos = [Estudiante, Acudiente, Administrativos]
+        usuario_encontrado = False
+
+        # Verificar si el correo existe en alguno de los modelos
+        for modelo in modelos:
+            try:
+                usuario = modelo.objects.get(correo=email)
+                usuario_encontrado = True
+                break
+            except modelo.DoesNotExist:
+                continue
+
+        if usuario_encontrado:
+            # Generar token único
+            token = secrets.token_urlsafe(32)
+
+            # Establecer fecha de expiración (24 horas)
+            fecha_expiracion = timezone.now() + timedelta(hours=24)
+
+            # Guardar el token en la base de datos
+            TokenRestablecimiento.objects.create(
+                correo=email,
+                token=token,
+                fecha_expiracion=fecha_expiracion
+            )
+
+            # Construir la URL de restablecimiento
+            reset_url = request.build_absolute_uri(
+                reverse('restablecerContrasena', args=[token])
+            )
+
+            # Enviar correo con el enlace
+            try:
+                send_mail(
+                    'Restablecimiento de contraseña',
+                    f'Haga clic en el siguiente enlace para restablecer su contraseña: {reset_url}\n'
+                    f'Este enlace expirará en 24 horas.',
+                    'noreplyvirttob@gmail.com',  # Remitente
+                    [email],  # Destinatario
+                    fail_silently=False,
+                )
+
+                # Mensaje de éxito (SUCCESS)
+                messages.success(
+                    request,
+                    'Se ha enviado un correo con instrucciones para restablecer su contraseña.'
+                )
+            except Exception as e:
+                # Mensaje de error (ERROR) si falla el envío
+                messages.error(
+                    request,
+                    'Ocurrió un error al enviar el correo. Por favor intente más tarde.'
+                )
+
+            return redirect('login')
+        else:
+            # Mantener mensajes genéricos por seguridad (INFO)
+            messages.info(
+                request,
+                'Si su correo está registrado, recibirá instrucciones para restablecer su contraseña.'
+            )
+            return redirect('login')
+
+    return render(request, 'solicitarRestablecer.html')
+
+
+def restablecerContrasena(request, token):
+    """Vista para establecer nueva contraseña con el token"""
+    try:
+        # Buscar el token en la base de datos
+        token_obj = TokenRestablecimiento.objects.get(token=token)
+
+        # Verificar si el token es válido
+        if not token_obj.esta_activo():
+            # Mensaje de advertencia (WARNING)
+            messages.warning(
+                request, 'El enlace ha expirado o ya ha sido utilizado.')
+            return redirect('login')
+
+        if request.method == 'POST':
+            # Obtener la nueva contraseña
+            nuevaContrasena = request.POST.get('password')
+            confirmacion = request.POST.get('confirm_password')
+
+            # Validar que las contraseñas coincidan
+            if nuevaContrasena != confirmacion:
+                # Mensaje de error (ERROR)
+                messages.error(request, 'Las contraseñas no coinciden.')
+                return render(request, 'restablecerContrasena.html', {'token': token})
+
+            # Hashear la contraseña antes de guardarla
+            contrasenaHasheada = make_password(nuevaContrasena)
+
+            # Actualizar la contraseña en todos los modelos donde exista el correo
+            modelos = [Estudiante, Acudiente, Administrativos]
+            actualizado = False
+
+            for modelo in modelos:
+                try:
+                    usuario = modelo.objects.get(correo=token_obj.correo)
+                    usuario.contrasena = contrasenaHasheada  # Guardar contraseña hasheada
+                    usuario.save()
+                    actualizado = True
+                except modelo.DoesNotExist:
+                    continue
+
+            # Marcar el token como usado
+            token_obj.usado = True
+            token_obj.save()
+
+            if actualizado:
+                # Mensaje de éxito (SUCCESS)
+                messages.success(
+                    request, 'Su contraseña ha sido actualizada correctamente.')
+            else:
+                # Mensaje de error (ERROR)
+                messages.error(request, 'No se pudo actualizar la contraseña.')
+
+            return redirect('login')
+
+        return render(request, 'restablecerContrasena.html', {'token': token})
+
+    except TokenRestablecimiento.DoesNotExist:
+        # Mensaje de error (ERROR)
+        messages.error(request, 'El enlace no es válido.')
+        return redirect('login')
