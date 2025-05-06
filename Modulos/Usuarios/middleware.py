@@ -1,5 +1,6 @@
 from django.shortcuts import redirect
 from django.urls import reverse
+from django.urls import resolve, Resolver404
 
 
 class SessionAuthMiddleware:
@@ -33,5 +34,21 @@ class SessionAuthMiddleware:
         if requires_auth and 'user_id' not in request.session:
             return redirect('login')
 
+        response = self.get_response(request)
+        return response
+
+
+class RedirectToHomeMiddleware:
+    def __init__(self, get_response):
+        self.get_response = get_response
+
+    def __call__(self, request):
+        try:
+            # Intenta resolver la URL solicitada
+            resolve(request.path_info)
+        except Resolver404:
+            # Si no se encuentra la URL, redirige a la página de inicio
+            # Cambia 'home' por el nombre de tu URL de inicio
+            return redirect('home')
         response = self.get_response(request)
         return response

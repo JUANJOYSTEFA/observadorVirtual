@@ -230,9 +230,9 @@ body::-webkit-scrollbar-thumb {
 }
 
 .custom-popover {
-  max-width: 500px;
+  max-width: 250px;
   /* Ajusta el ancho máximo según sea necesario */
-  font-size: 2.5em;
+  font-size: 1.2em;
   /* Cambia el tamaño de la fuente */
   padding: 15px;
   /* Ajusta el padding */
