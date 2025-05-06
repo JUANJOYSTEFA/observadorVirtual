@@ -138,13 +138,13 @@ def home(request):
             except Acudiente.DoesNotExist:
                 pass
 
-        elif user_type == 'administrativo':
+        elif user_type == 'directivo':
             try:
                 administrativo = Administrativos.objects.get(
                     idAdministrativo=user_id)
                 context['administrativo'] = administrativo
                 context['cargo'] = administrativo.cargo
-                context['admin'] = context['cargo'] == 'Directivo'
+                context['admin'] = context['cargo'] == 'directivo'
             except Administrativos.DoesNotExist:
                 pass
 
