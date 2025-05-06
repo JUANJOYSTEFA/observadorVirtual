@@ -1,5 +1,5 @@
 {% extends 'navSideBar.html' %}
-{% block tittle %} Grado {{grado}} {% endblock %}
+{% block tittle %} Grado {{grado.grado}} {% endblock %}
 {% block content %}
 {% load static %}
 <link rel="stylesheet" href="{% static 'css/stylesCarpetas.css' %}">
@@ -22,20 +22,24 @@
             <h5 class="mb-3">Ordenar</h5>
             <ul class="list-unstyled">
                 <li class="mb-2">
-                    <i class="bi bi-check-lg"></i><a href="?order_by=nombre" class="{% if order_by == 'nombre' %}active{% endif %}">Por nombre
+                    <i class="bi bi-check-lg"></i><a href="?order_by=nombre"
+                        class="{% if order_by == 'nombre' %}active{% endif %}">Por nombre
                         (a-z)</a>
                 </li>
                 <li class="mb-2">
-                    <i class="bi bi-check-lg"></i><a href="?order_by=-nombre" class="{% if order_by == '-nombre' %}active{% endif %}">Por nombre
+                    <i class="bi bi-check-lg"></i><a href="?order_by=-nombre"
+                        class="{% if order_by == '-nombre' %}active{% endif %}">Por nombre
                         (z-a)</a>
                 </li>
                 <li>
-                    <i class="bi bi-check-lg"></i><a href="?order_by=totalFaltas" class="{% if order_by == 'total_faltas' %}active{% endif %}">Por
+                    <i class="bi bi-check-lg"></i><a href="?order_by=totalFaltas"
+                        class="{% if order_by == 'total_faltas' %}active{% endif %}">Por
                         faltas (menor
                         a mayor)</a>
                 </li>
                 <li>
-                    <i class="bi bi-check-lg"></i><a href="?order_by=-totalFaltas" class="{% if order_by == '-total_faltas' %}active{% endif %}">Por
+                    <i class="bi bi-check-lg"></i><a href="?order_by=-totalFaltas"
+                        class="{% if order_by == '-total_faltas' %}active{% endif %}">Por
                         faltas
                         (mayor a menor)</a>
                 </li>
@@ -45,22 +49,31 @@
         <div class="col-2"></div>
         <div class="col-10">
             <div class="row justify-content-center">
-                <!-- Card 1 -->
-                {% if salones %}
-                {% for salones in salones %}
+                <div class="row">
+                    
+                {% if estudiantes %}
+                {% for estudiante in estudiantes %}
                 <div class="col-xl-3 col-lg-4 col-md-6 col-sm-12 d-flex justify-content-center mb-4">
                     <div class="card">
                         <div class="img-box">
-                            <img src="{% static 'img/logoCosfa.jpeg' %}" alt="">
+                            {% if estudiante.imagen_perfil %}
+                            <img src="{{ estudiante.imagen_perfil.url }}"
+                                alt="Foto de perfil de {{ estudiante.nombre }}" class="img-perfil" height="250px"
+                                style="border-radius: 10%;">
+                            {% else %}
+                            <img src="{% static 'img/default-profile.png' %}" alt="Imagen por defecto"
+                                class="img-perfil" height="250px">
+                            {% endif %}
                         </div>
                         <div class="content">
                             <div class="info">
-                                <h2>{{salones.grado}}</h2>
+                                <h2>{{ estudiante.nombre }} {{ estudiante.apellido }}</h2>
                                 <div class="data">
-                                    <h3>2<span>Faltas</span></h3>
+                                    <h3>{{ estudiante.totalFaltas }}<span>Faltas</span></h3>
+
                                 </div>
                                 <div class="btn-box">
-                                    <a href="{% url 'estudiantes' salones.idGrado %}"><button>Ver</button></a>
+                                    <a href="{% url 'observador' estudiante.documento %}"><button>Ver</button></a>
                                 </div>
                             </div>
                         </div>
@@ -72,7 +85,7 @@
                     <div class="col-1"></div>
                     <div class="col-10">
                         <div class="alert alert-danger" style="font-size: 20px;">
-                            <center>No hay grados con este nombre.</center>
+                            <center>No hay estudiantes en este grado.</center>
                         </div>
                     </div>
                     <div class="col-1"></div>

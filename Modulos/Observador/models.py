@@ -44,6 +44,7 @@ class Estudiante(models.Model):
     faltasTipo1 = models.IntegerField(default=0)
     faltasTipo2 = models.IntegerField(default=0)
     faltasTipo3 = models.IntegerField(default=0)
+    totalFaltas = models.IntegerField(default=0)
     idColegio = models.ForeignKey(
         Colegio, on_delete=models.CASCADE, related_name="estudiantes", default=1)
     idGrado = models.ForeignKey(

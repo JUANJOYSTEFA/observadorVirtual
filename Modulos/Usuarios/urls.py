@@ -9,7 +9,11 @@ urlpatterns = [
     # Mantiene la URL 'login/' pero usa la nueva vista
     path('login/', iniciar_sesion, name="login"),
     path('salones/', salones, name="salones"),
+    path('salones/<salon>', salon, name="salones"),
+    path('estudiantes/<idGrado>', estudiantes, name="estudiantes"),
     path('', home, name="home"),
+    path('buscar/', buscarEstudiantes, name='buscarEstudiantes'),
+    # otras urls...
     path('cerrar-sesion/', cerrar_sesion, name="cerrarSesion"),
     # URLs para restablecimiento de contraseña
     path('restablecer-contrasena/', solicitarRestablecer, name='solicitarRestablecer'),

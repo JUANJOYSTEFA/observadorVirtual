@@ -35,9 +35,14 @@
 <div class="overlay-text">
   <p>Bienvenido al</p>
   <h1>Observador Virtual</h1>
-  <a href="#">
+  <a href="{% url 'salones' %}">
     <button class="btn btn-color px-4 py-2 fs-5 mt-4">Ir al Observador</button>
   </a>
+  {% if admin %}
+  <a href="{% url 'listaGrado' %}">
+    <button class="btn btn-color px-4 py-2 fs-5 mt-4">Ir al Observador</button>
+  </a>
+  {% endif %}
 </div>
 
 {% else %}

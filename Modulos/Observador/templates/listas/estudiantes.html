@@ -59,7 +59,6 @@
                             <thead>
                                 <tr>
                                     <th>#</th>
-                                    <th>ID</th>
                                     <th>DOCUMENTO</th>
                                     <th>NOMBRE</th>
                                     <th>FECHA DE NACIMIENTO</th>
@@ -67,6 +66,7 @@
                                     <th>F1</th>
                                     <th>F2</th>
                                     <th>F3</th>
+                                    <th>TF</th>
                                     <th>COLEGIO</th>
                                     <th>GRADO</th>
                                     <th>OPCIONES</th>
@@ -77,7 +77,6 @@
                                 {% for estudiante in estudiante %}
                                 <tr>
                                     <td class="">{{ forloop.counter }}</td>
-                                    <td class="">{{ estudiante.idEstudiante }}</td>
                                     <td class="">{{ estudiante.documento }}</td>
                                     <td class="">{{ estudiante.nombre }} {{ estudiante.apellido }}</td>
                                     <td class="">{{ estudiante.fechaNacimiento }}</td>
@@ -85,6 +84,7 @@
                                     <td class="">{{ estudiante.faltasTipo1 }}</td>
                                     <td class="">{{ estudiante.faltasTipo2 }}</td>
                                     <td class="">{{ estudiante.faltasTipo3 }}</td>
+                                    <td class="">{{ estudiante.totalFaltas }}</td>
                                     <td class="">{{ estudiante.idColegio }}</td>
                                     <td class="">{{ estudiante.idGrado }}</td>
                                     <td>

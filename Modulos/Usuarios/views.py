@@ -1,3 +1,4 @@
+from django.shortcuts import render, get_object_or_404
 import secrets
 from django.urls import reverse
 from django.shortcuts import render, redirect
@@ -8,11 +9,14 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from django.contrib.auth.hashers import make_password, check_password
 from django.contrib.auth.decorators import login_required
+from django.db.models import Q
 from Modulos.Observador.models import *
 # Create your views here.
 
 
 def observadorEstudianteLibro(request, documento):
+    if not request.session.get('isLogged', False):
+        return redirect('login')
     # Obtener el estudiante por documento
     estudiante = get_object_or_404(Estudiante, documento=documento)
 
@@ -32,7 +36,73 @@ def observadorEstudianteLibro(request, documento):
 
 
 def salones(request):
-    return render(request, "observador/salones.html")
+
+    if not request.session.get('isLogged', False):
+        return redirect('login')
+    
+    salones = Grado.objects.all()
+    return render(request, "observador/salones.html", {'salones': salones})
+
+
+def salon(request, salon):
+    if not request.session.get('isLogged', False):
+        return redirect('login')
+    salones = Grado.objects.all()
+
+    if salon:
+        salones = salones.filter(
+            Q(grado__icontains=salon)
+        )
+
+    return render(request, "observador/salones.html", {'salones': salones})
+
+
+def estudiantes(request, idGrado):
+    if not request.session.get('isLogged', False):
+        return redirect('login')
+    # Obtener el grado específico o mostrar error 404 si no existe
+    grado = get_object_or_404(Grado, idGrado=idGrado)
+    # Obtener todos los estudiantes cuyo campo idGrado es este grado
+    estudiantes = Estudiante.objects.filter(idGrado=grado)
+    # Filtrar por nombre
+    query = request.GET.get('search', '')
+    if query:
+        estudiantes = estudiantes.filter(nombre__icontains=query)
+    # Ordenar
+    # Por defecto, ordenar por totalFaltas (de mayor a menor)
+    order_by = request.GET.get('order_by', '-totalFaltas')
+    estudiantes = estudiantes.order_by(order_by)
+    # Pasar grado y estudiantes al contexto para renderizar en la plantilla
+    context = {
+        'grado': grado,
+        'estudiantes': estudiantes,
+        'search_query': query,  # Pasar la consulta de búsqueda al contexto
+        'order_by': order_by,   # Pasar el criterio de ordenamiento al contexto
+    }
+    return render(request, 'observador/estudiantes.html', context)
+
+
+def buscarEstudiantes(request):
+    if not request.session.get('isLogged', False):
+        return redirect('login')
+    query = request.GET.get('search', '')
+    # Por defecto, ordenar por totalFaltas
+    order_by = request.GET.get('order_by', '-totalFaltas')
+    # Obtener todos los estudiantes
+    estudiantes = Estudiante.objects.all()
+    # Filtrar por nombre o apellido
+    if query:
+        estudiantes = estudiantes.filter(
+            Q(nombre__icontains=query) | Q(apellido__icontains=query)
+        )
+    # Ordenar
+    estudiantes = estudiantes.order_by(order_by)
+    context = {
+        'estudiantes': estudiantes,
+        'search_query': query,
+        'order_by': order_by,  # Pasar el criterio de ordenamiento al contexto
+    }
+    return render(request, 'observador/buscarEstudiantes.html', context)
 
 
 def home(request):
@@ -46,7 +116,8 @@ def home(request):
         context['userLogged'] = True
         # Asegúrate de que la clave sea correcta
         context['userType'] = request.session.get('userType')
-        context['userNombre'] = request.session.get('userNombre')  # Asegúrate de que la clave sea correcta
+        context['userNombre'] = request.session.get(
+            'userNombre')  # Asegúrate de que la clave sea correcta
 
         user_type = context['userType']
         # Asegúrate de que la clave sea correcta
@@ -73,6 +144,7 @@ def home(request):
                     idAdministrativo=user_id)
                 context['administrativo'] = administrativo
                 context['cargo'] = administrativo.cargo
+                context['admin'] = context['cargo'] == 'Directivo'
             except Administrativos.DoesNotExist:
                 pass
 

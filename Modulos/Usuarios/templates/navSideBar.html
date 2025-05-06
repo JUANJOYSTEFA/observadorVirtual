@@ -31,16 +31,31 @@
             <div class="d-flex align-items-center gap-3">
                 <!-- Buscar -->
                 <div class="box transition-box">
-                    <input type="text" placeholder="Buscar...">
-                    <a href="#">
-                        <i class="bi bi-search" style="color: #2f131e;"></i>
-                    </a>
+                    <form action="{% url 'buscarEstudiantes' %}" method="get"
+                        style="display: flex; align-items: center;">
+                        <input type="text" name="search" placeholder="Buscar..." required>
+                        <button type="submit"
+                            style="background: none; border: none; cursor: pointer; color: #2f131e; padding: 0 0 0 5px;">
+                            <i class="bi bi-search"></i>
+                        </button>
+                    </form>
                 </div>
 
                 <!-- Icono de usuario -->
+                {% if isLogged %}
+                <a tabindex="0" class="btn btn-outline-dark rounded" role="button" data-bs-toggle="popover"
+                    data-bs-trigger="focus" data-bs-html="true" data-bs-custom-class="custom-popover" title="Bienvenido"
+                    data-bs-content="{{ userNombre }}<br><a href='{% url 'cerrarSesion' %}' class='text-decoration-none'><i class='bi bi-box-arrow-right me-2'></i>Salir</a>">
+                    <i class='bi bi-person'></i>
+                </a>
+                {% else %}
                 <a class="btn btn-outline-dark rounded" href="{% url 'login' %}">
                     <i class="bi bi-person"></i>
                 </a>
+                {% endif %}
+
+
+
             </div>
         </nav>
 
@@ -66,9 +81,10 @@
                         </a>
                         <div class="collapse ps-3" id="submenu1">
                             <ul class="nav flex-column">
-                                <li class="nav-item"><a class="nav-link" href="#">Prejardin</a></li>
-                                <li class="nav-item"><a class="nav-link" href="#">Jardin</a></li>
-                                <li class="nav-item"><a class="nav-link" href="#">Transiciones</a></li>
+                                <li class="nav-item"><a class="nav-link" href="{% url 'salones' 'jardin'%}">Jardin</a>
+                                </li>
+                                <li class="nav-item"><a class="nav-link"
+                                        href="{% url 'salones' 'transicion'%}">Transiciones</a></li>
                             </ul>
                         </div>
                     </li>
@@ -82,8 +98,10 @@
                         </a>
                         <div class="collapse ps-3" id="submenu2">
                             <ul class="nav flex-column">
-                                <li class="nav-item"><a class="nav-link" href="#">Primero</a></li>
-                                <li class="nav-item"><a class="nav-link" href="#">Segundo</a></li>
+                                <li class="nav-item"><a class="nav-link" href="{% url 'salones' 'primero'%}">Primero</a>
+                                </li>
+                                <li class="nav-item"><a class="nav-link" href="{% url 'salones' 'segundo'%}">Segundo</a>
+                                </li>
                             </ul>
                         </div>
                     </li>
@@ -97,9 +115,12 @@
                         </a>
                         <div class="collapse ps-3" id="submenu3">
                             <ul class="nav flex-column">
-                                <li class="nav-item"><a class="nav-link" href="#">Tercero</a></li>
-                                <li class="nav-item"><a class="nav-link" href="#">Cuarto</a></li>
-                                <li class="nav-item"><a class="nav-link" href="#">Quinto</a></li>
+                                <li class="nav-item"><a class="nav-link" href="{% url 'salones' 'tercero'%}">Tercero</a>
+                                </li>
+                                <li class="nav-item"><a class="nav-link" href="{% url 'salones' 'cuarto'%}">Cuarto</a>
+                                </li>
+                                <li class="nav-item"><a class="nav-link" href="{% url 'salones' 'quinto'%}">Quinto</a>
+                                </li>
                             </ul>
                         </div>
                     </li>
@@ -113,9 +134,12 @@
                         </a>
                         <div class="collapse ps-3" id="submenu4">
                             <ul class="nav flex-column">
-                                <li class="nav-item"><a class="nav-link" href="#">Sexto</a></li>
-                                <li class="nav-item"><a class="nav-link" href="#">Septimo</a></li>
-                                <li class="nav-item"><a class="nav-link" href="#">Octavo</a></li>
+                                <li class="nav-item"><a class="nav-link" href="{% url 'salones' 'sexto'%}">Sexto</a>
+                                </li>
+                                <li class="nav-item"><a class="nav-link" href="{% url 'salones' 'septimo'%}">Septimo</a>
+                                </li>
+                                <li class="nav-item"><a class="nav-link" href="{% url 'salones' 'octavo'%}">Octavo</a>
+                                </li>
                             </ul>
                         </div>
                     </li>
@@ -129,16 +153,19 @@
                         </a>
                         <div class="collapse ps-3" id="submenu5">
                             <ul class="nav flex-column">
-                                <li class="nav-item"><a class="nav-link" href="#">Noveno</a></li>
-                                <li class="nav-item"><a class="nav-link" href="#">Decimo</a></li>
-                                <li class="nav-item"><a class="nav-link" href="#">Once</a></li>
+                                <li class="nav-item"><a class="nav-link" href="{% url 'salones' 'noveno'%}">Noveno</a>
+                                </li>
+                                <li class="nav-item"><a class="nav-link" href="{% url 'salones' 'decimo'%}">Decimo</a>
+                                </li>
+                                <li class="nav-item"><a class="nav-link" href="{% url 'salones' 'once'%}">Once</a></li>
                             </ul>
                         </div>
                     </li>
 
 
                     <li class="nav-item">
-                        <a class="nav-link" href="{% url 'cerrarSesion' %}"><i class="bi bi-box-arrow-right me-2"></i>Salir</a>
+                        <a class="nav-link" href="{% url 'cerrarSesion' %}"><i
+                                class="bi bi-box-arrow-right me-2"></i>Salir</a>
                     </li>
                 </ul>
             </div>
@@ -149,7 +176,14 @@
     </body>
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            var popoverTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="popover"]'))
+            var popoverList = popoverTriggerList.map(function (popoverTriggerEl) {
+                return new bootstrap.Popover(popoverTriggerEl)
+            })
+        });
+    </script>
 
     </body>
 
