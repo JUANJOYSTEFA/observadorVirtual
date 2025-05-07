@@ -8,6 +8,8 @@ from django.contrib import messages
 from django.conf import settings
 from django.core.files.storage import default_storage
 from django.contrib.auth.hashers import make_password, is_password_usable
+from django.core.mail import send_mail
+from datetime import datetime
 from .models import *
 from .forms import *
 import logging
@@ -40,7 +42,7 @@ class LoginFormView(LoginView):
 def listaColegio(request):
     if not request.session.get('isLogged', False):
         return redirect('login')
-    if request.session.get('userType', False) != "directivo" :
+    if request.session.get('userType', False) != "directivo":
         return redirect('home')
     query = request.GET.get("buscar", "")  # Obtener el valor del input
     colegios = Colegio.objects.all()
@@ -53,13 +55,13 @@ def listaColegio(request):
             Q(email__icontains=query)
         )
 
-    return render(request, "listas/colegios.html", {"colegio": colegios, "query": query, "userType" : request.session.get('userType')})
+    return render(request, "listas/colegios.html", {"colegio": colegios, "query": query, "userType": request.session.get('userType')})
 
 
 def agregarColegio(request):
     if not request.session.get('isLogged', False):
         return redirect('login')
-    if request.session.get('userType', False) != "directivo" :
+    if request.session.get('userType', False) != "directivo":
         return redirect('home')
     data = {
         'form': ColegioForm()
@@ -81,7 +83,7 @@ def agregarColegio(request):
 def modificarColegio(request, idColegio):
     if not request.session.get('isLogged', False):
         return redirect('login')
-    if request.session.get('userType', False) != "directivo" :
+    if request.session.get('userType', False) != "directivo":
         return redirect('home')
     # Busca un elemento por su ID
     colegio = get_object_or_404(Colegio, idColegio=idColegio)
@@ -107,7 +109,7 @@ def modificarColegio(request, idColegio):
 def eliminarColegio(request, idColegio):
     if not request.session.get('isLogged', False):
         return redirect('login')
-    if request.session.get('userType', False) != "directivo" :
+    if request.session.get('userType', False) != "directivo":
         return redirect('home')
     colegio = get_object_or_404(Colegio, idColegio=idColegio)
     colegio.delete()
@@ -118,7 +120,7 @@ def eliminarColegio(request, idColegio):
 def listaGrado(request):
     if not request.session.get('isLogged', False):
         return redirect('login')
-    if request.session.get('userType', False) != "directivo" :
+    if request.session.get('userType', False) != "directivo":
         return redirect('home')
     query = request.GET.get("buscar", "")  # Obtener el valor del input
     grados = Grado.objects.all()
@@ -136,7 +138,7 @@ def listaGrado(request):
 def agregarGrado(request):
     if not request.session.get('isLogged', False):
         return redirect('login')
-    if request.session.get('userType', False) != "directivo" :
+    if request.session.get('userType', False) != "directivo":
         return redirect('home')
     data = {
         'form': GradoForm()
@@ -158,7 +160,7 @@ def agregarGrado(request):
 def modificarGrado(request, idGrado):
     if not request.session.get('isLogged', False):
         return redirect('login')
-    if request.session.get('userType', False) != "directivo" :
+    if request.session.get('userType', False) != "directivo":
         return redirect('home')
     # Busca un elemento por su ID
     grado = get_object_or_404(Grado, idGrado=idGrado)
@@ -184,7 +186,7 @@ def modificarGrado(request, idGrado):
 def eliminarGrado(request, idGrado):
     if not request.session.get('isLogged', False):
         return redirect('login')
-    if request.session.get('userType', False) != "directivo" :
+    if request.session.get('userType', False) != "directivo":
         return redirect('home')
     grado = get_object_or_404(Grado, idGrado=idGrado)
     grado.delete()
@@ -195,7 +197,7 @@ def eliminarGrado(request, idGrado):
 def listaEstudiante(request):
     if not request.session.get('isLogged', False):
         return redirect('login')
-    if request.session.get('userType', False) != "directivo" :
+    if request.session.get('userType', False) != "directivo":
         return redirect('home')
     query = request.GET.get("buscar", "")  # Obtener el valor del input
     estudiante = Estudiante.objects.all()
@@ -222,7 +224,7 @@ def listaEstudiante(request):
 def agregarEstudiante(request):
     if not request.session.get('isLogged', False):
         return redirect('login')
-    if request.session.get('userType', False) != "directivo" :
+    if request.session.get('userType', False) != "directivo":
         return redirect('home')
     data = {
         'form': EstudianteForm(),
@@ -344,10 +346,11 @@ def modificarEstudiante(request, idEstudiante):
         data["form"] = formulario
     return render(request, 'modificar.html', data)
 
+
 def eliminarEstudiante(request, idEstudiante):
     if not request.session.get('isLogged', False):
         return redirect('login')
-    if request.session.get('userType', False) != "directivo" :
+    if request.session.get('userType', False) != "directivo":
         return redirect('home')
     estudiante = get_object_or_404(Estudiante, idEstudiante=idEstudiante)
     estudiante.delete()
@@ -361,10 +364,10 @@ def listaAcudiente(request):
     if request.session.get('userType', False) != "directivo":
         return redirect('home')
     query = request.GET.get("buscar", "")  # Obtener el valor del input
-    acudiente= Acudiente.objects.all() #Obtiene todos los registros
+    acudiente = Acudiente.objects.all()  # Obtiene todos los registros
 
     if query:
-        acudiente = acudiente.filter( #Filtra por cada campo
+        acudiente = acudiente.filter(  # Filtra por cada campo
             Q(tipoDocumento__icontains=query) |
             Q(documento__icontains=query) |
             Q(nombre__icontains=query) |
@@ -382,7 +385,7 @@ def listaAcudiente(request):
 def agregarAcudiente(request):
     if not request.session.get('isLogged', False):
         return redirect('login')
-    if request.session.get('userType', False) != "directivo" :
+    if request.session.get('userType', False) != "directivo":
         return redirect('home')
     data = {
         'form': AcudienteForm(),
@@ -414,7 +417,8 @@ def modificarAcudiente(request, idAcudiente):
         return redirect('home')
     # Busca un elemento por su ID
     acudiente = get_object_or_404(Acudiente, idAcudiente=idAcudiente)
-    contrasena_original = acudiente.contrasena if hasattr(acudiente, 'contrasena') else None
+    contrasena_original = acudiente.contrasena if hasattr(
+        acudiente, 'contrasena') else None
 
     data = {
         'form': AcudienteForm(instance=acudiente),
@@ -427,15 +431,16 @@ def modificarAcudiente(request, idAcudiente):
             data=request.POST, instance=acudiente, files=request.FILES)
         if formulario.is_valid():
             acudiente = formulario.save(commit=False)
-            
+
             # Verificar si la contraseña ha cambiado
             if hasattr(acudiente, 'contrasena') and acudiente.contrasena:
                 # Si la contraseña es nueva o ha cambiado, aplicar hash
                 if not contrasena_original or acudiente.contrasena != contrasena_original:
                     # Si la contraseña actual no parece un hash, aplicar hash
                     if not is_password_usable(acudiente.contrasena):
-                        acudiente.contrasena = make_password(acudiente.contrasena)
-            
+                        acudiente.contrasena = make_password(
+                            acudiente.contrasena)
+
             acudiente.save()
             messages.success(request, "Modificado Correctamente")
             return redirect('listaAcudiente')
@@ -447,9 +452,9 @@ def modificarAcudiente(request, idAcudiente):
 def eliminarAcudiente(request, idAcudiente):
     if not request.session.get('isLogged', False):
         return redirect('login')
-    if request.session.get('userType', False) != "directivo" :
+    if request.session.get('userType', False) != "directivo":
         return redirect('home')
-    acudiente = get_object_or_404(Acudiente, idGrado=idAcudiente)
+    acudiente = get_object_or_404(Acudiente, idAcudiente=idAcudiente)
     acudiente.delete()
     messages.success(request, "Eliminado Correctamente")
     return redirect(to="listaAcudiente")
@@ -475,6 +480,7 @@ def listaAdministrativo(request):
 
     return render(request, 'listas/administrativos.html', {'administrativo': administrativos, "query": query})
 
+
 def agregarAdministrativo(request):
     if not request.session.get('isLogged', False):
         return redirect('login')
@@ -489,11 +495,12 @@ def agregarAdministrativo(request):
             data=request.POST, files=request.FILES)
         if formulario.is_valid():
             administrativo = formulario.save(commit=False)
-            
+
             # Aplicar hash a la contraseña antes de guardar
             if hasattr(administrativo, 'contrasena') and administrativo.contrasena:
-                administrativo.contrasena = make_password(administrativo.contrasena)
-                
+                administrativo.contrasena = make_password(
+                    administrativo.contrasena)
+
             administrativo.save()
             messages.success(request, "Guardado Correctamente")
             return redirect('listaAdministrativo')
@@ -547,7 +554,7 @@ def modificarAdministrativo(request, idAdministrativo):
 def eliminarAdministrativo(request, idAdministrativo):
     if not request.session.get('isLogged', False):
         return redirect('login')
-    if request.session.get('userType', False) != "directivo" :
+    if request.session.get('userType', False) != "directivo":
         return redirect('home')
     administrativos = get_object_or_404(
         Administrativos, idAdministrativo=idAdministrativo)
@@ -559,7 +566,7 @@ def eliminarAdministrativo(request, idAdministrativo):
 def listaFalta(request):
     if not request.session.get('isLogged', False):
         return redirect('login')
-    if request.session.get('userType', False) != "directivo" :
+    if request.session.get('userType', False) != "directivo":
         return redirect('home')
     query = request.GET.get("buscar", "")  # Obtener el valor del input
     faltas = Faltas.objects.all()  # Obtiene todos los registros
@@ -578,7 +585,7 @@ def listaFalta(request):
 def agregarFalta(request):
     if not request.session.get('isLogged', False):
         return redirect('login')
-    if request.session.get('userType', False) != "directivo" :
+    if request.session.get('userType', False) != "directivo":
         return redirect('home')
     data = {
         'form': FaltasForm()
@@ -600,7 +607,7 @@ def agregarFalta(request):
 def modificarFalta(request, idFalta):
     if not request.session.get('isLogged', False):
         return redirect('login')
-    if request.session.get('userType', False) != "directivo" :
+    if request.session.get('userType', False) != "directivo":
         return redirect('home')
     # Busca un elemento por su ID
     faltas = get_object_or_404(
@@ -627,7 +634,7 @@ def modificarFalta(request, idFalta):
 def eliminarFalta(request, idFalta):
     if not request.session.get('isLogged', False):
         return redirect('login')
-    if request.session.get('userType', False) != "directivo" :
+    if request.session.get('userType', False) != "directivo":
         return redirect('home')
     faltas = get_object_or_404(Faltas, idFalta=idFalta)
     faltas.delete()
@@ -638,7 +645,7 @@ def eliminarFalta(request, idFalta):
 def listaObservacion(request):
     if not request.session.get('isLogged', False):
         return redirect('login')
-    if request.session.get('userType', False) != "directivo" :
+    if request.session.get('userType', False) != "directivo":
         return redirect('home')
     query = request.GET.get("buscar", "")  # Obtener el valor del input
     observaciones = Observacion.objects.all()  # Obtiene todos los registro
@@ -651,8 +658,8 @@ def listaObservacion(request):
             Q(idFalta__tipoFalta__icontains=query) |
             Q(idFalta__falta__icontains=query) |
             Q(idFalta__descripcion__icontains=query) |
-            Q(idEstudiante__nombre__icontains = query) |
-            Q(idEstudiante__apellido__icontains = query) |
+            Q(idEstudiante__nombre__icontains=query) |
+            Q(idEstudiante__apellido__icontains=query) |
             Q(idEstudiante__correo__icontains=query) |
             Q(idAdministrativo__nombre__icontains=query) |
             Q(idAdministrativo__apellido__icontains=query)
@@ -661,11 +668,10 @@ def listaObservacion(request):
     return render(request, 'listas/observaciones.html', {'observacion': observaciones, "query": query})
 
 
-
 def agregarObservacion(request):
     if not request.session.get('isLogged', False):
         return redirect('login')
-    if request.session.get('userType', False) != "directivo" :
+    if request.session.get('userType', False) != "directivo":
         return redirect('home')
     data = {
         'form': ObservacionForm()
@@ -689,6 +695,33 @@ def agregarObservacion(request):
 
             estudiante.totalFaltas += 1
 
+            ahora = datetime.now()
+            horaActual = ahora.strftime("%H:%M:%S")
+
+            send_mail(
+                f'Nueva Observación del Estudiante {estudiante.nombre} {estudiante.apellido}',
+                f'Fecha de la observación: {horaActual}\n'
+                f'Observación hecha por: {observacion.idAdministrativo.nombre} {observacion.idAdministrativo.apellido} \n'
+                f'Falta cometida por el estudiante: {observacion.idFalta.falta}: {observacion.idFalta.descripcion}\n'
+                f'Comentario: {observacion.comentario}',
+                'noreplyvirttob@gmail.com',  # Remitente
+                [estudiante.correo],  # Destinatario
+                fail_silently=False,
+            )
+
+            acudientes = Acudiente.objects.filter(idEstudiante=estudiante.idEstudiante)
+            for acudiente in acudientes:
+                send_mail(
+                    f'Nueva Observación del Estudiante {estudiante.nombre} {estudiante.apellido}',
+                    f'Fecha de la observación: {horaActual}\n'
+                    f'Observación hecha por: {observacion.idAdministrativo.nombre} {observacion.idAdministrativo.apellido} \n'
+                    f'Falta cometida por el estudiante: {observacion.idFalta.falta}: {observacion.idFalta.descripcion}\n'
+                    f'Comentario: {observacion.comentario}',
+                    'noreplyvirttob@gmail.com',  # Remitente
+                    [acudiente.correo],  # Destinatario
+                    fail_silently=False,
+                )
+
             estudiante.save()  # Guardar los cambios en el estudiante
 
             messages.success(
@@ -704,7 +737,7 @@ def agregarObservacion(request):
 def modificarObservacion(request, idObservacion):
     if not request.session.get('isLogged', False):
         return redirect('login')
-    if request.session.get('userType', False) != "directivo" :
+    if request.session.get('userType', False) != "directivo":
         return redirect('home')
     # Busca un elemento por su ID
     observacion = get_object_or_404(
@@ -731,7 +764,7 @@ def modificarObservacion(request, idObservacion):
 def eliminarObservacion(request, idObservacion):
     if not request.session.get('isLogged', False):
         return redirect('login')
-    if request.session.get('userType', False) != "directivo" :
+    if request.session.get('userType', False) != "directivo":
         return redirect('home')
     observacion = get_object_or_404(Observacion, idObservacion=idObservacion)
 
@@ -758,11 +791,10 @@ def eliminarObservacion(request, idObservacion):
     return redirect(to="listaObservacion")
 
 
-
 def listaCitacion(request):
     if not request.session.get('isLogged', False):
         return redirect('login')
-    if request.session.get('userType', False) != "directivo" :
+    if request.session.get('userType', False) != "directivo":
         return redirect('home')
     query = request.GET.get("buscar", "")  # Obtener el valor del input
     citaciones = Citaciones.objects.all()  # Obtiene todos los registro
@@ -772,8 +804,8 @@ def listaCitacion(request):
             Q(fecha__icontains=query) |
             Q(hora__icontains=query) |
             Q(asistencia__icontains=query) |
-            Q(idEstudiante__nombre__icontains = query) |
-            Q(idEstudiante__apellido__icontains = query) |
+            Q(idEstudiante__nombre__icontains=query) |
+            Q(idEstudiante__apellido__icontains=query) |
             Q(idEstudiante__correo__icontains=query) |
             Q(idEstudiante__correo__icontains=query) |
             Q(idAcudiente__nombre__icontains=query) |
@@ -787,7 +819,7 @@ def listaCitacion(request):
 def agregarCitacion(request):
     if not request.session.get('isLogged', False):
         return redirect('login')
-    if request.session.get('userType', False) != "directivo" :
+    if request.session.get('userType', False) != "directivo":
         return redirect('home')
     data = {
         'form': CitacionesForm()
@@ -809,7 +841,7 @@ def agregarCitacion(request):
 def modificarCitacion(request, idCitacion):
     if not request.session.get('isLogged', False):
         return redirect('login')
-    if request.session.get('userType', False) != "directivo" :
+    if request.session.get('userType', False) != "directivo":
         return redirect('home')
     # Busca un elemento por su ID
     citaciones = get_object_or_404(
@@ -843,10 +875,11 @@ def eliminarCitacion(request, idCitacion):
     messages.success(request, "Eliminado Correctamente")
     return redirect(to="listaCitacion")
 
+
 def observadorEstudianteLibro(request, idEstudiante):
     if not request.session.get('isLogged', False):
         return redirect('login')
     estudiante = get_object_or_404(Estudiante, idEstudiante=idEstudiante)
     acudiente = get_object_or_404(Acudiente, idEstudiante=idEstudiante)
     observacion = get_object_or_404(Observacion, idEstudiante=idEstudiante)
-    return render(request, 'observador/libro.html', {"estudiante":estudiante, "acudiente":acudiente, "observacion":observacion})
+    return render(request, 'observador/libro.html', {"estudiante": estudiante, "acudiente": acudiente, "observacion": observacion})

@@ -17,21 +17,20 @@ from Modulos.Observador.models import *
 def observadorEstudianteLibro(request, documento):
     if not request.session.get('isLogged', False):
         return redirect('login')
-    # Obtener el estudiante por documento
-    estudiante = get_object_or_404(Estudiante, documento=documento)
 
-    # Obtener el acudiente si existe
+    estudiante = get_object_or_404(Estudiante, documento=documento)
     acudiente = Acudiente.objects.filter(
         idEstudiante=estudiante.idEstudiante).first()
+    observaciones = list(Observacion.objects.filter(
+        idEstudiante=estudiante.idEstudiante))
 
-    # Obtener todas las observaciones del estudiante
-    observacion = Observacion.objects.filter(
-        idEstudiante=estudiante.idEstudiante)
+    # Agrupar observaciones de a 3
+    observaciones_agrupadas = [observaciones[i:i+3] for i in range(0, len(observaciones), 3)]
 
     return render(request, 'observador/libro.html', {
         "estudiante": estudiante,
         "acudiente": acudiente,
-        "observacion": observacion
+        "observaciones_agrupadas": observaciones_agrupadas
     })
 
 

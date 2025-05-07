@@ -107,3 +107,46 @@ body {
   top: 10%;
   width: 90%;
 }
+
+.fab-container {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  z-index: 9999;
+}
+
+.fab-button {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background-color: #128031;
+  color: white;
+  border: none;
+  font-size: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+  transition: all 0.3s ease;
+}
+
+.fab-label {
+  position: absolute;
+  right: 70px;
+  bottom: 50%;
+  transform: translateY(50%) scaleX(0);
+  background-color: #128031;
+  color: white;
+  padding: 10px 16px;
+  border-radius: 20px;
+  font-size: 14px;
+  white-space: nowrap;
+  transition: transform 0.3s ease;
+  transform-origin: right;
+  opacity: 0;
+}
+
+.fab-container:hover .fab-label {
+  transform: translateY(50%) scaleX(1);
+  opacity: 1;
+}

@@ -9,7 +9,7 @@ class Colegio(models.Model):
     email = models.EmailField(max_length=100)
 
     def __str__(self):
-        return f"idColegio: {self.idColegio}, Nombre: {self.nombre}"
+        return f"Nombre: {self.nombre} ({self.idColegio})"
 
     class Meta:
         verbose_name = 'Colegio'
@@ -23,7 +23,7 @@ class Grado(models.Model):
         Colegio, on_delete=models.CASCADE, related_name="grado", default=1)
 
     def __str__(self):
-        return f"Ciclo: {self.ciclo}, Grado: {self.grado}"
+        return f"Grado: {self.grado} (Ciclo: {self.ciclo})"
 
 
 class Estudiante(models.Model):
@@ -53,7 +53,7 @@ class Estudiante(models.Model):
         upload_to='perfiles/', blank=True, null=True)
 
     def __str__(self):
-        return f"{self.idEstudiante}, {self.apellido} {self.nombre}, Identificación: {self.tipoDocumento} {self.documento}"
+        return f"{self.apellido} {self.nombre}, {self.tipoDocumento} {self.documento}"
 
     class Meta:
         verbose_name = 'Estudiante'
@@ -80,7 +80,7 @@ class Acudiente(models.Model):
         Estudiante, on_delete=models.CASCADE, related_name="acudientes")
 
     def __str__(self):
-        return f"Estudiante: {self.idEstudiante}, Nombre Acudiente: {self.apellido} {self.nombre}"
+        return f"{self.apellido} {self.nombre} (Estudiante: {self.idEstudiante})"
 
     class Meta:
         verbose_name = 'Acudiente'
@@ -103,8 +103,8 @@ class Administrativos(models.Model):
 
     def __str__(self):
         if self.cargo == 'profesor' and self.ciclo:
-            return f"idAdministrativo: {self.idAdministrativo}, Nombre: {self.nombre} {self.apellido}, Cargo: {self.cargo}, Ciclo: {self.ciclo}"
-        return f"idAdministrativo: {self.idAdministrativo}, Nombre: {self.nombre} {self.apellido}, Cargo: {self.cargo}"
+            return f"{self.nombre} {self.apellido}, Cargo: {self.cargo} (Ciclo: {self.ciclo})"
+        return f"{self.nombre} {self.apellido}, Cargo: {self.cargo}"
 
     class Meta:
         verbose_name = 'Administrativos'
