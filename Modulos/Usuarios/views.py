@@ -17,6 +17,11 @@ from Modulos.Observador.models import *
 def observadorEstudianteLibro(request, documento):
     if not request.session.get('isLogged', False):
         return redirect('login')
+    userType = request.session.get('userType', False)
+    admin = userType ==  'profesor' or userType == 'directivo'
+    documentoIniciado = request.session.get('documento', False)
+    if (userType == 'estudiante' or userType == 'acudiente') and documento != documentoIniciado:
+        return redirect('observador', documento=documentoIniciado)
 
     estudiante = get_object_or_404(Estudiante, documento=documento)
     acudiente = Acudiente.objects.filter(
@@ -25,20 +30,26 @@ def observadorEstudianteLibro(request, documento):
         idEstudiante=estudiante.idEstudiante))
 
     # Agrupar observaciones de a 3
-    observaciones_agrupadas = [observaciones[i:i+3] for i in range(0, len(observaciones), 3)]
+    observaciones_agrupadas = [observaciones[i:i+3]
+                               for i in range(0, len(observaciones), 3)]
 
     return render(request, 'observador/libro.html', {
         "estudiante": estudiante,
         "acudiente": acudiente,
-        "observaciones_agrupadas": observaciones_agrupadas
+        "observaciones_agrupadas": observaciones_agrupadas,
+        "admin": admin,
     })
 
 
 def salones(request):
-
     if not request.session.get('isLogged', False):
         return redirect('login')
     
+    userType = request.session.get('userType', False)
+    documentoIniciado = request.session.get('documento', False)
+    if (userType == 'estudiante' or userType == 'acudiente'):
+        return redirect('observador', documento=documentoIniciado)
+
     salones = Grado.objects.all()
     return render(request, "observador/salones.html", {'salones': salones})
 
@@ -47,6 +58,11 @@ def salon(request, salon):
     if not request.session.get('isLogged', False):
         return redirect('login')
     salones = Grado.objects.all()
+
+    userType = request.session.get('userType', False)
+    documentoIniciado = request.session.get('documento', False)
+    if (userType == 'estudiante' or userType == 'acudiente'):
+        return redirect('observador', documento=documentoIniciado)
 
     if salon:
         salones = salones.filter(
@@ -59,6 +75,12 @@ def salon(request, salon):
 def estudiantes(request, idGrado):
     if not request.session.get('isLogged', False):
         return redirect('login')
+    
+    userType = request.session.get('userType', False)
+    documentoIniciado = request.session.get('documento', False)
+    if (userType == 'estudiante' or userType == 'acudiente'):
+        return redirect('observador', documento=documentoIniciado)
+
     # Obtener el grado específico o mostrar error 404 si no existe
     grado = get_object_or_404(Grado, idGrado=idGrado)
     # Obtener todos los estudiantes cuyo campo idGrado es este grado
@@ -84,6 +106,12 @@ def estudiantes(request, idGrado):
 def buscarEstudiantes(request):
     if not request.session.get('isLogged', False):
         return redirect('login')
+    
+    userType = request.session.get('userType', False)
+    documentoIniciado = request.session.get('documento', False)
+    if (userType == 'estudiante' or userType == 'acudiente'):
+        return redirect('observador', documento=documentoIniciado)
+
     query = request.GET.get('search', '')
     # Por defecto, ordenar por totalFaltas
     order_by = request.GET.get('order_by', '-totalFaltas')
@@ -104,17 +132,58 @@ def buscarEstudiantes(request):
     return render(request, 'observador/buscarEstudiantes.html', context)
 
 
+def crearCitacion(request, idEstudiante):
+    estudiante = get_object_or_404(Estudiante, idEstudiante=idEstudiante)
+
+    if request.method == 'POST':
+        fecha = request.POST['fecha']
+        hora = request.POST['hora']
+        acudiente = get_object_or_404(Acudiente, idEstudiante=idEstudiante)
+
+        if not acudiente:
+            messages.error(
+                request, "Este estudiante no tiene acudiente registrado.")
+            return redirect('observador', documento=estudiante.documento)
+
+        citacion = Citaciones.objects.create(
+            fecha=fecha,
+            hora=hora,
+            idEstudiante=estudiante,
+            idAcudiente=acudiente
+        )
+
+        # Redirigir a Google Calendar
+        dtInicio = datetime.strptime(f"{fecha} {hora}", "%Y-%m-%d %H:%M")
+        dtFin = dtInicio + timedelta(minutes=30)
+        print("Redireccionando a:", reverse('observador', kwargs={'documento': estudiante.documento}))
+        def formatoFecha(dt):
+            return dt.strftime('%Y%m%dT%H%M%S')
+
+        url = "https://calendar.google.com/calendar/render?action=TEMPLATE"
+        url += f"&text=Citación con {acudiente.nombre} {acudiente.apellido} y {estudiante.nombre} {estudiante.apellido}"
+        url += f"&dates={formatoFecha(dtInicio)}/{formatoFecha(dtFin)}"
+        url += "&details=Observador Virtual - Reunión con acudiente"
+        url += "&location=Colegio San Francisco de Asís"
+        url += "&sf=true&output=xml"
+
+        return redirect(url)
+    # ← Aquí estudiante ya está definido
+    return redirect('observador', documento=estudiante.documento)
+
+
+
 def home(request):
     """Vista de la página de inicio"""
 
     # Inicializa el contexto
     context = {}
     isLoggedIn = request.session.get('isLogged', False)
+    id = request.session.get('userId', False)
+    context['userType'] = request.session.get('userType', False)
 
     if isLoggedIn:
         context['userLogged'] = True
         # Asegúrate de que la clave sea correcta
-        context['userType'] = request.session.get('userType')
         context['userNombre'] = request.session.get(
             'userNombre')  # Asegúrate de que la clave sea correcta
 
@@ -126,6 +195,8 @@ def home(request):
             try:
                 estudiante = Estudiante.objects.get(idEstudiante=user_id)
                 context['estudiante'] = estudiante
+                context['documento'] = estudiante.documento
+                request.session['documento'] = context['documento']
             except Estudiante.DoesNotExist:
                 pass
 
@@ -134,6 +205,8 @@ def home(request):
                 acudiente = Acudiente.objects.get(idAcudiente=user_id)
                 context['acudiente'] = acudiente
                 context['estudianteRelacionado'] = acudiente.idEstudiante
+                context['documento'] = context['estudianteRelacionado'].documento
+                request.session['documento'] = context['documento']
             except Acudiente.DoesNotExist:
                 pass
 

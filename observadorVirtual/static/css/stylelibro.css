@@ -112,41 +112,89 @@ body {
   position: fixed;
   bottom: 20px;
   right: 20px;
-  z-index: 9999;
+  display: flex;
+  flex-direction: column-reverse;
+  /* invierte el orden */
+  align-items: center;
+  gap: 15px;
+  z-index: 1000;
+}
+
+.fab-item {
+  position: relative;
 }
 
 .fab-button {
   width: 60px;
   height: 60px;
   border-radius: 50%;
-  background-color: #128031;
+  background-color: #28a745;
   color: white;
   border: none;
   font-size: 24px;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
-  transition: all 0.3s ease;
+  position: relative;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
 }
 
-.fab-label {
+.fab-button:hover {
+  background-color: #218838;
+}
+
+.fab-tooltip {
+  visibility: hidden;
+  opacity: 0;
   position: absolute;
   right: 70px;
-  bottom: 50%;
-  transform: translateY(50%) scaleX(0);
-  background-color: #128031;
+  background-color: #333;
   color: white;
-  padding: 10px 16px;
-  border-radius: 20px;
-  font-size: 14px;
+  padding: 6px 10px;
+  border-radius: 4px;
   white-space: nowrap;
-  transition: transform 0.3s ease;
-  transform-origin: right;
-  opacity: 0;
+  font-size: 14px;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
 }
 
-.fab-container:hover .fab-label {
-  transform: translateY(50%) scaleX(1);
+.fab-button:hover .fab-tooltip {
+  visibility: visible;
   opacity: 1;
+}
+
+.back-button-container {
+  position: fixed;
+  /* Fija el botón en la pantalla */
+  top: 20px;
+  /* Espaciado desde la parte superior */
+  left: 20px;
+  /* Espaciado desde la izquierda */
+  z-index: 1000;
+  /* Asegura que esté por encima de otros elementos */
+}
+
+.back-button {
+  background-color: #6c757d;
+  /* Color de fondo */
+  color: white;
+  /* Color del texto */
+  border: none;
+  /* Sin borde */
+  padding: 10px 20px;
+  /* Espaciado interno */
+  border-radius: 5px;
+  /* Bordes redondeados */
+  font-size: 16px;
+  /* Tamaño de fuente */
+  cursor: pointer;
+  /* Cambia el cursor al pasar el mouse */
+  transition: background-color 0.3s;
+  /* Transición suave para el color de fondo */
+}
+
+.back-button:hover {
+  background-color: #5a6268;
+  /* Color de fondo al pasar el mouse */
 }

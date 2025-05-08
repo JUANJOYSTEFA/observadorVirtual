@@ -157,6 +157,7 @@ class Citaciones(models.Model):
         Acudiente, on_delete=models.CASCADE, related_name="citaciones")
     idEstudiante = models.ForeignKey(
         Estudiante, on_delete=models.CASCADE, related_name="citaciones")
+    asistencia = models.BooleanField(null=True)
 
     def __str__(self):
         return f"Fecha: {self.fecha} {self.hora}, {self.idAcudiente}"

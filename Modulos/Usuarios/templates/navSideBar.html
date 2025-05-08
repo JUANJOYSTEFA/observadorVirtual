@@ -45,7 +45,7 @@
                 {% if isLogged %}
                 <a tabindex="0" class="btn btn-outline-dark rounded" role="button" data-bs-toggle="popover"
                     data-bs-trigger="focus" data-bs-html="true" data-bs-custom-class="custom-popover" title="Bienvenido"
-                    data-bs-content="{{ userNombre }}<br><a href='{% url 'cerrarSesion' %}' class='text-decoration-none'><i class='bi bi-box-arrow-right me-2'></i>Salir</a>">
+                    data-bs-content="{{ userNombre }} <span style='color:gray; font-size:15px'>({{ userType }})</span><br><a href='{% url 'cerrarSesion' %}' class='text-decoration-none'><i class='bi bi-box-arrow-right me-2'></i>Salir</a>">
                     <i class='bi bi-person'></i>
                 </a>
                 {% else %}

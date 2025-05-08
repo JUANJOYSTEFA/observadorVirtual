@@ -14,6 +14,13 @@
   <body>
     <link rel="stylesheet" href="{% static 'css/stylelibro.css' %}">
     <div class="container">
+      <div class="back-button-container">
+        <a href="{% url 'home' %}">
+          <button class="btn btn-secondary back-button">
+            <i class="bi bi-arrow-left"></i> Volver al inicio
+          </button>
+        </a>
+      </div>
       <div class="book-container">
         <div class="book" id="book">
           <!-- Portada -->
@@ -134,108 +141,146 @@
           </div>
         </div>
       </div>
-
       <div class="fab-container">
-        <div class="fab-label">Crear Citación</div>
-        <button class="fab-button">
-          <i class="bi bi-calendar-event"></i>
-        </button>
+        <div class="fab-item">
+          <button class="fab-button">
+            <i class="bi bi-file-earmark-pdf"></i>
+            <span class="fab-tooltip">Descargar PDF</span>
+          </button>
+        </div>
+        {% if admin %}
+        <div class="fab-item">
+          <button class="fab-button" data-bs-toggle="modal" data-bs-target="#modalCitacion">
+            <i class="bi bi-calendar-event"></i>
+            <span class="fab-tooltip">Crear Citación</span>
+          </button>
+        </div>
+        {% endif %}
       </div>
+      <!-- Modal de las citaciones -->
+      <div class="modal fade" id="modalCitacion" tabindex="-1" aria-labelledby="modalCitacionLabel" aria-hidden="true">
+        <div class="modal-dialog">
+          <form method="post" action="{% url 'crearCitacion' estudiante.idEstudiante   %}">
+            {% csrf_token %}
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title" id="modalCitacionLabel">Agendar Citación</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+              </div>
+              <div class="modal-body">
+                <div class="mb-3">
+                  <label for="fecha" class="form-label">Fecha</label>
+                  <input type="date" class="form-control" name="fecha" required>
+                </div>
+                <div class="mb-3">
+                  <label for="hora" class="form-label">Hora</label>
+                  <input type="time" class="form-control" name="hora" required>
+                </div>
+              </div>
+              <div class="modal-footer">
+                <button type="submit" class="btn btn-success">Guardar y Agendar</button>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
 
-      <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
-      <script>
-        document.addEventListener('DOMContentLoaded', function () {
-          const book = document.getElementById('book');
-          const pages = document.querySelectorAll('.page');
-          const prevBtn = document.getElementById('prev-btn');
-          const nextBtn = document.getElementById('next-btn');
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+      document.addEventListener('DOMContentLoaded', function () {
+        const book = document.getElementById('book');
+        const pages = document.querySelectorAll('.page');
+        const prevBtn = document.getElementById('prev-btn');
+        const nextBtn = document.getElementById('next-btn');
 
-          let currentPage = 0;
-          const totalPages = pages.length;
+        let currentPage = 0;
+        const totalPages = pages.length;
 
-          // Función para actualizar los botones
-          function updateButtons() {
-            prevBtn.disabled = currentPage === 0;
-            nextBtn.disabled = currentPage === totalPages - 1;
+        // Función para actualizar los botones
+        function updateButtons() {
+          prevBtn.disabled = currentPage === 0;
+          nextBtn.disabled = currentPage === totalPages - 1;
+        }
+
+        // Función para pasar a la siguiente página
+        function nextPage() {
+          if (currentPage < totalPages - 1) {
+            // Obtener la página actual y la siguiente
+            const currentPageElem = pages[currentPage];
+            const nextPageElem = pages[currentPage + 1];
+
+            // Aplicar las clases para la animación
+            currentPageElem.classList.add('flipped');
+            currentPageElem.classList.remove('current');
+            nextPageElem.classList.add('current');
+
+            // Actualizar el índice de la página actual
+            currentPage++;
+
+            // Actualizar los botones
+            updateButtons();
           }
+        }
 
-          // Función para pasar a la siguiente página
-          function nextPage() {
-            if (currentPage < totalPages - 1) {
-              // Obtener la página actual y la siguiente
-              const currentPageElem = pages[currentPage];
-              const nextPageElem = pages[currentPage + 1];
+        // Función para ir a la página anterior
+        function prevPage() {
+          if (currentPage > 0) {
+            // Obtener la página actual y la anterior
+            const currentPageElem = pages[currentPage];
+            const prevPageElem = pages[currentPage - 1];
 
-              // Aplicar las clases para la animación
-              currentPageElem.classList.add('flipped');
-              currentPageElem.classList.remove('current');
-              nextPageElem.classList.add('current');
+            // Aplicar las clases para la animación
+            currentPageElem.classList.remove('current');
+            prevPageElem.classList.remove('flipped');
+            prevPageElem.classList.add('current');
 
-              // Actualizar el índice de la página actual
-              currentPage++;
+            // Actualizar el índice de la página actual
+            currentPage--;
 
-              // Actualizar los botones
-              updateButtons();
-            }
+            // Actualizar los botones
+            updateButtons();
           }
+        }
 
-          // Función para ir a la página anterior
-          function prevPage() {
-            if (currentPage > 0) {
-              // Obtener la página actual y la anterior
-              const currentPageElem = pages[currentPage];
-              const prevPageElem = pages[currentPage - 1];
+        // Asignar los eventos a los botones
+        nextBtn.addEventListener('click', nextPage);
+        prevBtn.addEventListener('click', prevPage);
 
-              // Aplicar las clases para la animación
-              currentPageElem.classList.remove('current');
-              prevPageElem.classList.remove('flipped');
-              prevPageElem.classList.add('current');
+        // Inicializar los botones
+        updateButtons();
 
-              // Actualizar el índice de la página actual
-              currentPage--;
-
-              // Actualizar los botones
-              updateButtons();
-            }
-          }
-
-          // Asignar los eventos a los botones
-          nextBtn.addEventListener('click', nextPage);
-          prevBtn.addEventListener('click', prevPage);
-
-          // Inicializar los botones
-          updateButtons();
-
-          // Ajustar z-index de las páginas para la visualización correcta
-          function updateZIndex() {
-            pages.forEach((page, index) => {
-              if (index < currentPage) {
-                page.style.zIndex = 1;
-              } else if (index === currentPage) {
-                page.style.zIndex = totalPages;
-              } else {
-                page.style.zIndex = totalPages - index;
-              }
-            });
-          }
-
-          // Ajustar z-index inicial
-          updateZIndex();
-
-          // Actualizar z-index cuando cambia la página
-          nextBtn.addEventListener('click', updateZIndex);
-          prevBtn.addEventListener('click', updateZIndex);
-
-          // Añadir funcionalidad para pasar las páginas con las teclas de flecha
-          document.addEventListener('keydown', function (event) {
-            if (event.key === 'ArrowRight') {
-              nextPage();  // Flecha derecha: siguiente página
-            } else if (event.key === 'ArrowLeft') {
-              prevPage();  // Flecha izquierda: página anterior
+        // Ajustar z-index de las páginas para la visualización correcta
+        function updateZIndex() {
+          pages.forEach((page, index) => {
+            if (index < currentPage) {
+              page.style.zIndex = 1;
+            } else if (index === currentPage) {
+              page.style.zIndex = totalPages;
+            } else {
+              page.style.zIndex = totalPages - index;
             }
           });
+        }
+
+        // Ajustar z-index inicial
+        updateZIndex();
+
+        // Actualizar z-index cuando cambia la página
+        nextBtn.addEventListener('click', updateZIndex);
+        prevBtn.addEventListener('click', updateZIndex);
+
+        // Añadir funcionalidad para pasar las páginas con las teclas de flecha
+        document.addEventListener('keydown', function (event) {
+          if (event.key === 'ArrowRight') {
+            nextPage();  // Flecha derecha: siguiente página
+          } else if (event.key === 'ArrowLeft') {
+            prevPage();  // Flecha izquierda: página anterior
+          }
         });
-      </script>
+      });
+    </script>
 
   </body>
 
