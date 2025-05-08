@@ -30,6 +30,7 @@ urlpatterns = [
     path('eliminarFalta/<idFalta>/', eliminarFalta, name="eliminarFalta"),
     path('listaObservacion/', listaObservacion, name='listaObservacion'),
     path('agregarObservacion/', agregarObservacion, name="agregarObservacion"),
+    path('agregarObservacion/<int:idEstudiante>/', agregarObservacionProfesor, name='agregarObservacionProfesor'),
     path('modificarObservacion/<idObservacion>/', modificarObservacion, name="modificarObservacion"),
     path('eliminarObservacion/<idObservacion>/', eliminarObservacion, name="eliminarObservacion"),
     path('listaCitacion/', listaCitacion, name='listaCitacion'),

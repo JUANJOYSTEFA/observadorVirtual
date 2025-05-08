@@ -28,7 +28,7 @@ def observadorEstudianteLibro(request, documento):
         idEstudiante=estudiante.idEstudiante).first()
     observaciones = list(Observacion.objects.filter(
         idEstudiante=estudiante.idEstudiante))
-
+    idEstudiante = estudiante.idEstudiante
     # Agrupar observaciones de a 3
     observaciones_agrupadas = [observaciones[i:i+3]
                                for i in range(0, len(observaciones), 3)]
@@ -38,6 +38,7 @@ def observadorEstudianteLibro(request, documento):
         "acudiente": acudiente,
         "observaciones_agrupadas": observaciones_agrupadas,
         "admin": admin,
+        "idEstudiante" : idEstudiante
     })
 
 

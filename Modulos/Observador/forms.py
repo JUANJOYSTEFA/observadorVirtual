@@ -90,6 +90,56 @@ class ObservacionForm(forms.ModelForm):
         model = Observacion
         fields = "__all__"
 
+class ObservacionFormProfesor(forms.ModelForm):
+    fecha = forms.DateField(
+        widget=forms.DateInput(
+            attrs={'type': 'date', 'class': 'form-control'},
+            format='%Y-%m-%d'
+        ),
+        input_formats=['%Y-%m-%d']
+    )
+    hora = forms.TimeField(
+        widget=forms.TimeInput(attrs={'type': 'time', 'class': 'form-control'})
+    )
+    
+    # Campos ocultos para asegurar que los valores se envíen
+    estudiante_hidden = forms.IntegerField(widget=forms.HiddenInput(), required=False)
+    administrativo_hidden = forms.IntegerField(widget=forms.HiddenInput(), required=False)
+    
+    class Meta:
+        model = Observacion
+        fields = ['idFalta', 'comentario', 'fecha', 'hora', 'estudiante_hidden', 'administrativo_hidden']
+    
+    def __init__(self, *args, **kwargs):
+        estudiante_id = kwargs.pop('estudiante_id', None)
+        administrativo_id = kwargs.pop('administrativo_id', None)
+        super().__init__(*args, **kwargs)
+        
+        # Configurar campo de estudiante
+        if estudiante_id:
+            self.fields['idEstudiante'] = forms.ModelChoiceField(
+                queryset=Estudiante.objects.filter(idEstudiante=estudiante_id),
+                widget=forms.Select(attrs={'class': 'form-control', 'readonly': 'readonly'}),
+                initial=estudiante_id,
+                required=False
+            )
+            self.initial['estudiante_hidden'] = estudiante_id
+        else:
+            self.fields['idEstudiante'] = forms.ModelChoiceField(
+                queryset=Estudiante.objects.all(),
+                widget=forms.Select(attrs={'class': 'form-control'}),
+            )
+        
+        # Configurar campo de administrativo
+        if administrativo_id:
+            self.fields['idAdministrativo'] = forms.ModelChoiceField(
+                queryset=Administrativos.objects.filter(idAdministrativo=administrativo_id),
+                widget=forms.Select(attrs={'class': 'form-control', 'readonly': 'readonly'}),
+                initial=administrativo_id,
+                required=False
+            )
+            self.initial['administrativo_hidden'] = administrativo_id
+
 
 class CitacionesForm(forms.ModelForm):
     

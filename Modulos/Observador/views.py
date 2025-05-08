@@ -696,7 +696,7 @@ def agregarObservacion(request):
             estudiante.totalFaltas += 1
 
             ahora = datetime.now()
-            horaActual = ahora.strftime("%H:%M:%S")
+            horaActual = ahora.strftime('%d/%m/%Y %H:%M:%S')
 
             send_mail(
                 f'Nueva Observación del Estudiante {estudiante.nombre} {estudiante.apellido}',
@@ -732,6 +732,107 @@ def agregarObservacion(request):
             messages.warning(request, "El archivo ya existe")
 
     return render(request, 'agregar/observacion.html', data)
+
+def agregarObservacionProfesor(request, idEstudiante):
+    if not request.session.get('isLogged', False):
+        return redirect('login')
+    if request.session.get('userType', False) != "directivo":
+        return redirect('home')
+
+    # Obtener el estudiante
+    estudiante = get_object_or_404(Estudiante, idEstudiante=idEstudiante)
+    administrativoId = request.session.get('userId')
+    
+    data = {
+        'form': ObservacionFormProfesor(estudiante_id=idEstudiante, administrativo_id=administrativoId)
+    }
+
+    if request.method == 'POST':
+        formulario = ObservacionFormProfesor(
+            request.POST, 
+            request.FILES,
+            estudiante_id=idEstudiante,
+            administrativo_id=administrativoId
+        )
+        
+        if formulario.is_valid():
+            observacion = formulario.save(commit=False)  # No guardar aún
+            
+            # Usar los valores de los campos ocultos
+            estudiante_id = formulario.cleaned_data.get('estudiante_hidden', idEstudiante)
+            administrativo_id = formulario.cleaned_data.get('administrativo_hidden', administrativoId)
+            
+            # Asignar el estudiante y el administrativo
+            observacion.idEstudiante = estudiante
+            observacion.idAdministrativo_id = administrativoId
+            
+            # Si los campos de fecha y hora no están en el formulario, asignarlos automáticamente
+            if not observacion.fecha:
+                observacion.fecha = datetime.now().date()
+            if not observacion.hora:
+                observacion.hora = datetime.now().time()
+
+            # Guardar la observación
+            observacion.save()
+
+            tipo_falta = observacion.idFalta.tipoFalta  # Obtener el tipo de falta
+
+            # Incrementar el campo correspondiente en el estudiante
+            if tipo_falta == 1:
+                estudiante.faltasTipo1 += 1
+            elif tipo_falta == 2:
+                estudiante.faltasTipo2 += 1
+            elif tipo_falta == 3:
+                estudiante.faltasTipo3 += 1
+
+            estudiante.totalFaltas += 1
+
+            ahora = datetime.now()
+            horaActual = ahora.strftime('%d/%m/%Y, %H:%M:%S')
+
+            # Preparar el mensaje para correos
+            mensaje = (
+                f'Fecha de la observación: {horaActual}\n'
+                f'Observación hecha por: {observacion.idAdministrativo.nombre} {observacion.idAdministrativo.apellido} \n'
+                f'Falta cometida por el estudiante: {observacion.idFalta.falta}: {observacion.idFalta.descripcion}\n'
+                f'Comentario: {observacion.comentario}'
+            )
+            
+            asunto = f'Nueva Observación del Estudiante {estudiante.nombre} {estudiante.apellido}'
+            remitente = 'noreplyvirttob@gmail.com'
+
+            # Enviar correo al estudiante
+            send_mail(
+                asunto,
+                mensaje,
+                remitente,
+                [estudiante.correo],
+                fail_silently=False,
+            )
+
+            # Enviar correos a los acudientes
+            acudientes = Acudiente.objects.filter(idEstudiante=estudiante.idEstudiante)
+            destinatariosAcudientes = [acudiente.correo for acudiente in acudientes]
+            
+            if destinatariosAcudientes:
+                send_mail(
+                    asunto,
+                    mensaje,
+                    remitente,
+                    destinatariosAcudientes,
+                    fail_silently=False,
+                )
+
+            estudiante.save()  # Guardar los cambios en el estudiante
+
+            messages.success(request, "Guardado Correctamente y falta registrada")
+            return redirect('listaObservacion')
+        else:
+            data["form"] = formulario
+            messages.warning(request, "Por favor corrija los errores en el formulario")
+
+    return render(request, 'agregar/observacion.html', data)
+
 
 
 def modificarObservacion(request, idObservacion):
