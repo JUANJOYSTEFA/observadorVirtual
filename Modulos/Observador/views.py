@@ -676,61 +676,6 @@ def listaObservacion(request):
     return render(request, 'listas/observaciones.html', {'observacion': observaciones, "query": query})
 
 
-""" Sistema de correos de google (No terminado)
-def enviar_correos(observacion, estudiante):
-    ahora = datetime.now()
-    horaActual = ahora.strftime('%d/%m/%Y %H:%M:%S')
-    fechaActual = ahora.strftime('%d/%m/%Y')
-    acudientes = Acudiente.objects.filter(idEstudiante=estudiante.idEstudiante)
-
-    context = {
-        'horaActual': horaActual,
-        'acudiente': acudientes,
-        'observacion': observacion,
-        'nombre_estudiante': f'{estudiante.nombre} {estudiante.apellido}',
-    }
-
-    html_message = render_to_string('correosTemplate.html', context)
-    plain_message = strip_tags(html_message)
-    asunto = f'Nueva Observación del Estudiante {context["nombre_estudiante"]}'
-    remitente = 'noreplyvirttob@gmail.com'
-
-    # Autenticación con la API de Gmail
-    credentials_path = os.path.join(
-        settings.BASE_DIR,
-        'observadorVirtual', 'credenciales',
-        'virtob-560fb1558384.json'
-    )
-
-    credentials = service_account.Credentials.from_service_account_file(
-        credentials_path)
-    scoped_credentials = credentials.with_scopes(
-        ['https://www.googleapis.com/auth/gmail.send'])
-    scoped_credentials.refresh(Request())
-    service = build('gmail', 'v1', credentials=scoped_credentials)
-
-    def enviar_email(destinatario):
-        mensaje = MIMEText(html_message, 'html')
-        mensaje['to'] = destinatario
-        mensaje['from'] = remitente
-        mensaje['subject'] = asunto
-
-        mensaje_raw = base64.urlsafe_b64encode(mensaje.as_bytes()).decode()
-
-        service.users().messages().send(
-            userId='me',
-            body={'raw': mensaje_raw}
-        ).execute()
-
-    # Enviar al estudiante
-    enviar_email(estudiante.correo)
-
-    # Enviar a los acudientes
-    for acudiente in acudientes:
-        enviar_email(acudiente.correo)
-"""
-
-
 def enviar_correos(observacion, estudiante):
     ahora = datetime.now()
     horaActual = ahora.strftime('%d/%m/%Y %H:%M:%S')
