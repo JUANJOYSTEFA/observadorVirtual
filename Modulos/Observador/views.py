@@ -766,7 +766,7 @@ def agregarObservacion(request):
 def agregarObservacionProfesor(request, idEstudiante):
     if not request.session.get('isLogged', False):
         return redirect('login')
-    if request.session.get('userType', False) != "directivo":
+    if request.session.get('userType', False) != "directivo" and request.session.get('userType', False) != "profesor":
         return redirect('home')
 
     # Obtener el estudiante

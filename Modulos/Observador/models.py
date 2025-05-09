@@ -48,7 +48,7 @@ class Estudiante(models.Model):
     idColegio = models.ForeignKey(
         Colegio, on_delete=models.CASCADE, related_name="estudiantes", default=1)
     idGrado = models.ForeignKey(
-        Grado, on_delete=models.CASCADE, null=True, blank=True)
+        Grado, on_delete=models.CASCADE, null=True, blank=True, related_name="estudiante")
     imagen_perfil = models.ImageField(
         upload_to='perfiles/', blank=True, null=True)
 

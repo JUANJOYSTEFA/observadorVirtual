@@ -12,7 +12,7 @@ from django.contrib.auth.decorators import login_required
 from django.template.loader import get_template
 from django.http import HttpResponse
 from xhtml2pdf import pisa
-from django.db.models import Q
+from django.db.models import Q, Count
 from Modulos.Observador.models import *
 # Create your views here.
 
@@ -76,8 +76,8 @@ def salones(request):
     if (userType == 'estudiante' or userType == 'acudiente'):
         return redirect('observador', documento=documentoIniciado)
 
-    salones = Grado.objects.all()
-    return render(request, "observador/salones.html", {'salones': salones})
+    salones = Grado.objects.annotate(numEstudiantes=Count('estudiante'))
+    return render(request, "observador/salones.html", {'salones': salones},)
 
 
 def salon(request, salon):
@@ -236,6 +236,16 @@ def home(request):
             except Acudiente.DoesNotExist:
                 pass
 
+        elif user_type == 'profesor':
+            try:
+                administrativo = Administrativos.objects.get(
+                    idAdministrativo=user_id)
+                context['administrativo'] = administrativo
+                context['cargo'] = administrativo.cargo
+                context['profesor'] = context['cargo'] == 'profesor'
+            except Administrativos.DoesNotExist:
+                pass
+    
         elif user_type == 'directivo':
             try:
                 administrativo = Administrativos.objects.get(
