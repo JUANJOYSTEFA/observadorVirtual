@@ -683,6 +683,7 @@ def enviar_correos(observacion, estudiante):
         'acudiente': acudientes,
         'observacion': observacion,
         'nombre_estudiante': f'{estudiante.nombre} {estudiante.apellido}',
+        'fechaActual': fechaActual,
     }
     # Render the HTML template
     html_message = render_to_string('correosTemplate.html', context)

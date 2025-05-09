@@ -9,8 +9,9 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from django.contrib.auth.hashers import make_password, check_password
 from django.contrib.auth.decorators import login_required
-from django.template.loader import get_template
+from django.template.loader import get_template, render_to_string
 from django.http import HttpResponse
+from django.utils.html import strip_tags
 from xhtml2pdf import pisa
 from django.db.models import Q, Count
 from Modulos.Observador.models import *
@@ -328,13 +329,14 @@ def solicitarRestablecer(request):
 
         # Lista de modelos para buscar el correo
         modelos = [Estudiante, Acudiente, Administrativos]
-        usuario_encontrado = False
+        
 
         # Verificar si el correo existe en alguno de los modelos
         for modelo in modelos:
             try:
                 usuario = modelo.objects.get(correo=email)
                 usuario_encontrado = True
+                nombre = f"{usuario.nombre} {usuario.apellido}"
                 break
             except modelo.DoesNotExist:
                 continue
@@ -358,14 +360,28 @@ def solicitarRestablecer(request):
                 reverse('restablecerContrasena', args=[token])
             )
 
+            ahora = datetime.now()
+            fechaActual = ahora.strftime('%d/%m/%Y')
             # Enviar correo con el enlace
             try:
+                context = {
+                    'fechaActual': fechaActual,
+                    'reset_url': reset_url,
+                    'nombre': nombre,
+                }
+                # Render the HTML template
+                html_message = render_to_string('contrasenaTemplate.html', context)
+                # This will strip the HTML to create a plain text version
+                plain_message = strip_tags(html_message)
+                asunto = 'Restablecimiento de contraseña'
+                remitente = 'noreplyvirttob@gmail.com'
+                # Enviar correo al estudiante
                 send_mail(
-                    'Restablecimiento de contraseña',
-                    f'Haga clic en el siguiente enlace para restablecer su contraseña: {reset_url}\n'
-                    f'Este enlace expirará en 24 horas.',
-                    'noreplyvirttob@gmail.com',  # Remitente
-                    [email],  # Destinatario
+                    asunto,
+                    plain_message,
+                    remitente,
+                    [email],
+                    html_message=html_message,
                     fail_silently=False,
                 )
 
