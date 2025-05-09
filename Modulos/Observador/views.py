@@ -12,11 +12,7 @@ from django.contrib.auth.hashers import make_password, is_password_usable
 from django.core.mail import send_mail
 from django.template.loader import render_to_string
 from django.utils.html import strip_tags
-from google.oauth2 import service_account
-from google.auth.transport.requests import Request
 from email.mime.text import MIMEText
-from googleapiclient.discovery import build
-import google.auth
 from datetime import datetime
 from .models import *
 from .forms import *

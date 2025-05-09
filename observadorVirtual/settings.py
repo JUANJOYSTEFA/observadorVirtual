@@ -35,7 +35,7 @@ EMAIL_HOST = 'smtp.gmail.com'  # O tu proveedor de correo
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 EMAIL_HOST_USER = 'noreplyvirttob@gmail.com'
-EMAIL_HOST_PASSWORD = 'zixj hbfm ptyx ziem'
+EMAIL_HOST_PASSWORD = 'uiae txko tbon hbgf'
 
 # Application definition
 
