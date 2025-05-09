@@ -6,3 +6,8 @@ django-crispy-forms
 crispy-bootstrap5
 pillow
 passlib
+google-auth
+google-auth-oauthlib
+google-api-python-client 
+google-auth-httplib2 
+xhtml2pdf

@@ -11,6 +11,7 @@ urlpatterns = [
     path('salones/<salon>', salon, name="salones"),
     path('estudiantes/<idGrado>', estudiantes, name="estudiantes"),    
     path('buscar/', buscarEstudiantes, name='buscarEstudiantes'),
+    path('observaciones/pdf/<int:idEstudiante>/', generarPdfObservaciones, name='generarPdfObservaciones'),
     path('crear-citacion/<int:idEstudiante>/', crearCitacion, name='crearCitacion'),
     path('', home, name="home"),
     path('cerrar-sesion/', cerrar_sesion, name="cerrarSesion"),

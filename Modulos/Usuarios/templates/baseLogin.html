@@ -16,6 +16,13 @@
 
     <body>
         <div class="container" id="container">
+            <div class="back-button-container">
+                <a href="{% url 'home' %}">
+                    <button class="btn btn-secondary back-button">
+                        <i class="bi bi-arrow-left"></i> Volver al inicio
+                    </button>   
+                </a>
+            </div>
             <div class="form-container sign-in">
                 {% block content %}
 

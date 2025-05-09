@@ -9,6 +9,9 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from django.contrib.auth.hashers import make_password, check_password
 from django.contrib.auth.decorators import login_required
+from django.template.loader import get_template
+from django.http import HttpResponse
+from xhtml2pdf import pisa
 from django.db.models import Q
 from Modulos.Observador.models import *
 # Create your views here.
@@ -41,6 +44,28 @@ def observadorEstudianteLibro(request, documento):
         "idEstudiante" : idEstudiante
     })
 
+
+def generarPdfObservaciones(request, idEstudiante):
+    estudiante = get_object_or_404(Estudiante, idEstudiante=idEstudiante)
+    observaciones = estudiante.observaciones.all().order_by('fecha')
+
+    template_path = 'templatePDF.html'
+    context = {
+        'estudiante': estudiante,
+        'observaciones': observaciones
+    }
+
+    response = HttpResponse(content_type='application/pdf')
+    response['Content-Disposition'] = f'attachment; filename="observador_{estudiante.documento}.pdf"'
+
+    template = get_template(template_path)
+    html = template.render(context)
+
+    pisa_status = pisa.CreatePDF(html, dest=response)
+
+    if pisa_status.err:
+        return HttpResponse('Ocurrió un error al generar el PDF', status=500)
+    return response
 
 def salones(request):
     if not request.session.get('isLogged', False):

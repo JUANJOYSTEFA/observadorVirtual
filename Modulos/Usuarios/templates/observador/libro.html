@@ -143,10 +143,12 @@
       </div>
       <div class="fab-container">
         <div class="fab-item">
-          <button class="fab-button">
-            <i class="bi bi-file-earmark-pdf"></i>
-            <span class="fab-tooltip">Descargar PDF</span>
-          </button>
+          <a href="{% url 'generarPdfObservaciones' idEstudiante %}">
+            <button class="fab-button">
+              <i class="bi bi-file-earmark-pdf"></i>
+              <span class="fab-tooltip">Descargar PDF</span>
+            </button>
+          </a>
         </div>
         {% if admin %}
         <div class="fab-item">
@@ -157,11 +159,11 @@
         </div>
         <div class="fab-item">
           <a href="{% url 'agregarObservacionProfesor' idEstudiante %}">
-          <button class="fab-button">
-            <i class="bi bi-file-earmark-plus"></i>
-            <span class="fab-tooltip">Agregar Observación</span>
-          </button>
-        </a>
+            <button class="fab-button">
+              <i class="bi bi-file-earmark-plus"></i>
+              <span class="fab-tooltip">Agregar Observación</span>
+            </button>
+          </a>
         </div>
         {% endif %}
       </div>

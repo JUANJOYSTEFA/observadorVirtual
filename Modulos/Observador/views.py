@@ -1,4 +1,5 @@
 import os
+import base64
 from .models import Observacion, Estudiante
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.views import LoginView
@@ -9,6 +10,13 @@ from django.conf import settings
 from django.core.files.storage import default_storage
 from django.contrib.auth.hashers import make_password, is_password_usable
 from django.core.mail import send_mail
+from django.template.loader import render_to_string
+from django.utils.html import strip_tags
+from google.oauth2 import service_account
+from google.auth.transport.requests import Request
+from email.mime.text import MIMEText
+from googleapiclient.discovery import build
+import google.auth
 from datetime import datetime
 from .models import *
 from .forms import *
@@ -668,6 +676,110 @@ def listaObservacion(request):
     return render(request, 'listas/observaciones.html', {'observacion': observaciones, "query": query})
 
 
+""" Sistema de correos de google (No terminado)
+def enviar_correos(observacion, estudiante):
+    ahora = datetime.now()
+    horaActual = ahora.strftime('%d/%m/%Y %H:%M:%S')
+    fechaActual = ahora.strftime('%d/%m/%Y')
+    acudientes = Acudiente.objects.filter(idEstudiante=estudiante.idEstudiante)
+
+    context = {
+        'horaActual': horaActual,
+        'acudiente': acudientes,
+        'observacion': observacion,
+        'nombre_estudiante': f'{estudiante.nombre} {estudiante.apellido}',
+    }
+
+    html_message = render_to_string('correosTemplate.html', context)
+    plain_message = strip_tags(html_message)
+    asunto = f'Nueva Observación del Estudiante {context["nombre_estudiante"]}'
+    remitente = 'noreplyvirttob@gmail.com'
+
+    # Autenticación con la API de Gmail
+    credentials_path = os.path.join(
+        settings.BASE_DIR,
+        'observadorVirtual', 'credenciales',
+        'virtob-560fb1558384.json'
+    )
+
+    credentials = service_account.Credentials.from_service_account_file(
+        credentials_path)
+    scoped_credentials = credentials.with_scopes(
+        ['https://www.googleapis.com/auth/gmail.send'])
+    scoped_credentials.refresh(Request())
+    service = build('gmail', 'v1', credentials=scoped_credentials)
+
+    def enviar_email(destinatario):
+        mensaje = MIMEText(html_message, 'html')
+        mensaje['to'] = destinatario
+        mensaje['from'] = remitente
+        mensaje['subject'] = asunto
+
+        mensaje_raw = base64.urlsafe_b64encode(mensaje.as_bytes()).decode()
+
+        service.users().messages().send(
+            userId='me',
+            body={'raw': mensaje_raw}
+        ).execute()
+
+    # Enviar al estudiante
+    enviar_email(estudiante.correo)
+
+    # Enviar a los acudientes
+    for acudiente in acudientes:
+        enviar_email(acudiente.correo)
+"""
+
+
+def enviar_correos(observacion, estudiante):
+    ahora = datetime.now()
+    horaActual = ahora.strftime('%d/%m/%Y %H:%M:%S')
+    fechaActual = ahora.strftime('%d/%m/%Y')
+    acudientes = Acudiente.objects.filter(idEstudiante=estudiante.idEstudiante)
+    # Prepare the context for the email template
+    context = {
+        'horaActual': horaActual,
+        'acudiente': acudientes,
+        'observacion': observacion,
+        'nombre_estudiante': f'{estudiante.nombre} {estudiante.apellido}',
+    }
+    # Render the HTML template
+    html_message = render_to_string('correosTemplate.html', context)
+    # This will strip the HTML to create a plain text version
+    plain_message = strip_tags(html_message)
+    asunto = f'Nueva Observación del Estudiante {context["nombre_estudiante"]}'
+    remitente = 'noreplyvirttob@gmail.com'
+    # Enviar correo al estudiante
+    send_mail(
+        asunto,
+        plain_message,
+        remitente,
+        [estudiante.correo],
+        html_message=html_message,
+        fail_silently=False,
+    )
+    # Enviar correos a los acudientes
+    send_mail(
+        asunto,
+        plain_message,
+        remitente,
+        [estudiante.correo],
+        html_message=html_message,
+        fail_silently=False,
+    )
+    # Enviar correos a los acudientes
+    destinatariosAcudientes = [acudiente.correo for acudiente in acudientes]
+    if destinatariosAcudientes:
+        send_mail(
+            asunto,
+            plain_message,
+            remitente,
+            destinatariosAcudientes,
+            html_message=html_message,
+            fail_silently=False,
+        )
+
+
 def agregarObservacion(request):
     if not request.session.get('isLogged', False):
         return redirect('login')
@@ -680,10 +792,9 @@ def agregarObservacion(request):
     if request.method == 'POST':
         formulario = ObservacionForm(data=request.POST, files=request.FILES)
         if formulario.is_valid():
-            observacion = formulario.save()  # Guardar la observación y obtener el objeto
-
-            estudiante = observacion.idEstudiante  # Obtener el estudiante
-            tipo_falta = observacion.idFalta.tipoFalta  # Obtener el tipo de falta
+            observacion = formulario.save()
+            estudiante = observacion.idEstudiante
+            tipo_falta = observacion.idFalta.tipoFalta
 
             # Incrementar el campo correspondiente en el estudiante
             if tipo_falta == 1:
@@ -694,35 +805,8 @@ def agregarObservacion(request):
                 estudiante.faltasTipo3 += 1
 
             estudiante.totalFaltas += 1
-
-            ahora = datetime.now()
-            horaActual = ahora.strftime('%d/%m/%Y %H:%M:%S')
-
-            send_mail(
-                f'Nueva Observación del Estudiante {estudiante.nombre} {estudiante.apellido}',
-                f'Fecha de la observación: {horaActual}\n'
-                f'Observación hecha por: {observacion.idAdministrativo.nombre} {observacion.idAdministrativo.apellido} \n'
-                f'Falta cometida por el estudiante: {observacion.idFalta.falta}: {observacion.idFalta.descripcion}\n'
-                f'Comentario: {observacion.comentario}',
-                'noreplyvirttob@gmail.com',  # Remitente
-                [estudiante.correo],  # Destinatario
-                fail_silently=False,
-            )
-
-            acudientes = Acudiente.objects.filter(idEstudiante=estudiante.idEstudiante)
-            for acudiente in acudientes:
-                send_mail(
-                    f'Nueva Observación del Estudiante {estudiante.nombre} {estudiante.apellido}',
-                    f'Fecha de la observación: {horaActual}\n'
-                    f'Observación hecha por: {observacion.idAdministrativo.nombre} {observacion.idAdministrativo.apellido} \n'
-                    f'Falta cometida por el estudiante: {observacion.idFalta.falta}: {observacion.idFalta.descripcion}\n'
-                    f'Comentario: {observacion.comentario}',
-                    'noreplyvirttob@gmail.com',  # Remitente
-                    [acudiente.correo],  # Destinatario
-                    fail_silently=False,
-                )
-
             estudiante.save()  # Guardar los cambios en el estudiante
+            enviar_correos(observacion, estudiante)
 
             messages.success(
                 request, "Guardado Correctamente y falta registrada")
@@ -733,6 +817,7 @@ def agregarObservacion(request):
 
     return render(request, 'agregar/observacion.html', data)
 
+
 def agregarObservacionProfesor(request, idEstudiante):
     if not request.session.get('isLogged', False):
         return redirect('login')
@@ -742,30 +827,33 @@ def agregarObservacionProfesor(request, idEstudiante):
     # Obtener el estudiante
     estudiante = get_object_or_404(Estudiante, idEstudiante=idEstudiante)
     administrativoId = request.session.get('userId')
-    
+
     data = {
         'form': ObservacionFormProfesor(estudiante_id=idEstudiante, administrativo_id=administrativoId)
     }
 
     if request.method == 'POST':
         formulario = ObservacionFormProfesor(
-            request.POST, 
+            request.POST,
             request.FILES,
             estudiante_id=idEstudiante,
             administrativo_id=administrativoId
         )
-        
+
         if formulario.is_valid():
-            observacion = formulario.save(commit=False)  # No guardar aún
-            
+            observacion = formulario.save(commit=False)
+            estudiante = get_object_or_404(
+                Estudiante, idEstudiante=idEstudiante)
             # Usar los valores de los campos ocultos
-            estudiante_id = formulario.cleaned_data.get('estudiante_hidden', idEstudiante)
-            administrativo_id = formulario.cleaned_data.get('administrativo_hidden', administrativoId)
-            
+            estudiante_id = formulario.cleaned_data.get(
+                'estudiante_hidden', idEstudiante)
+            administrativo_id = formulario.cleaned_data.get(
+                'administrativo_hidden', administrativoId)
+
             # Asignar el estudiante y el administrativo
             observacion.idEstudiante = estudiante
             observacion.idAdministrativo_id = administrativoId
-            
+
             # Si los campos de fecha y hora no están en el formulario, asignarlos automáticamente
             if not observacion.fecha:
                 observacion.fecha = datetime.now().date()
@@ -787,52 +875,17 @@ def agregarObservacionProfesor(request, idEstudiante):
 
             estudiante.totalFaltas += 1
 
-            ahora = datetime.now()
-            horaActual = ahora.strftime('%d/%m/%Y, %H:%M:%S')
-
-            # Preparar el mensaje para correos
-            mensaje = (
-                f'Fecha de la observación: {horaActual}\n'
-                f'Observación hecha por: {observacion.idAdministrativo.nombre} {observacion.idAdministrativo.apellido} \n'
-                f'Falta cometida por el estudiante: {observacion.idFalta.falta}: {observacion.idFalta.descripcion}\n'
-                f'Comentario: {observacion.comentario}'
-            )
-            
-            asunto = f'Nueva Observación del Estudiante {estudiante.nombre} {estudiante.apellido}'
-            remitente = 'noreplyvirttob@gmail.com'
-
-            # Enviar correo al estudiante
-            send_mail(
-                asunto,
-                mensaje,
-                remitente,
-                [estudiante.correo],
-                fail_silently=False,
-            )
-
-            # Enviar correos a los acudientes
-            acudientes = Acudiente.objects.filter(idEstudiante=estudiante.idEstudiante)
-            destinatariosAcudientes = [acudiente.correo for acudiente in acudientes]
-            
-            if destinatariosAcudientes:
-                send_mail(
-                    asunto,
-                    mensaje,
-                    remitente,
-                    destinatariosAcudientes,
-                    fail_silently=False,
-                )
-
             estudiante.save()  # Guardar los cambios en el estudiante
-
-            messages.success(request, "Guardado Correctamente y falta registrada")
+            enviar_correos(observacion, estudiante)
+            messages.success(
+                request, "Guardado Correctamente y falta registrada")
             return redirect('listaObservacion')
         else:
             data["form"] = formulario
-            messages.warning(request, "Por favor corrija los errores en el formulario")
+            messages.warning(
+                request, "Por favor corrija los errores en el formulario")
 
     return render(request, 'agregar/observacion.html', data)
-
 
 
 def modificarObservacion(request, idObservacion):
